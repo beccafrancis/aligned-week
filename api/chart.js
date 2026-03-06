@@ -9,11 +9,11 @@ export default async function handler(req, res) {
   const apiKey = process.env.HD_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
   try {
-    const datetime = `${date}T${time}`;
+    const datetime = `${date}T${time}+00:00`;
     const response = await fetch('https://api.humandesignhub.app/v1/simple-bodygraph', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-API-KEY': apiKey },
-      body: JSON.stringify({ date, time, city, datetime })
+      body: JSON.stringify({ datetime, city })
     });
     if (!response.ok) return res.status(response.status).json({ error: await response.text() });
     return res.status(200).json(await response.json());
