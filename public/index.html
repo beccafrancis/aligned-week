@@ -741,22 +741,7 @@ async function calculateChart() {
 }
 
 function parseHubResponse(data) {
-  if (data.Properties) {
-    const p = data.Properties;
-    return {
-      type: p.Type?.option || '?',
-      authority: p.InnerAuthority?.option || '?',
-      profile: p.Profile?.id || '?',
-      definedCenters: (data.DefinedCenters || []).map(c => c.replace(' center','')).map(c => c.charAt(0).toUpperCase() + c.slice(1)),
-      gates: data.Gates || [],
-      channels: data.Channels || [],
-      incarnationCross: p.IncarnationCross?.option || '',
-      strategy: p.Strategy?.option || '',
-      definition: p.Definition?.option || '',
-      chartUrl: data.ChartUrl || null
-    };
-  }
-  return {
+  if (data.Properties) { const p = data.Properties; return { type: p.Type?.option || "?", authority: p.InnerAuthority?.option || "?", profile: p.Profile?.id || "?", cross: p.IncarnationCross?.option || "", definition: p.Definition?.option || "", strategy: p.Strategy?.option || "", gates: data.Gates || [], channels: data.Channels || [], centers: (data.DefinedCenters || []).map(c => c.replace(" center","").split(" ").map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(" ")), raw: data }; }
   // humandesignhub.app response shape
   // data.type, data.authority, data.profile, data.incarnationCross
   // data.gates = array of {gate, line, planet, type} or just numbers
