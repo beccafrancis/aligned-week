@@ -741,6 +741,7 @@ async function calculateChart() {
 }
 
 function parseHubResponse(data) {
+  // bodygraphchart.com format
   if (data.Properties) {
     const p = data.Properties;
     return {
@@ -756,6 +757,7 @@ function parseHubResponse(data) {
       chartUrl: data.ChartUrl || null
     };
   }
+  // fallback
   return {
   // humandesignhub.app response shape
   // data.type, data.authority, data.profile, data.incarnationCross
