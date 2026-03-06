@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aligned Week · Human Design</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Fraunces:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FAFAF8;
+  --surface: #FFFFFF;
+  --card: #F5F5F2;
+  --border: #E8E8E4;
+  --border-accent: #C8D4C0;
+  --text: #1A1A18;
+  --muted: #8A8A82;
+  --accent: #4A6741;
+  --accent-light: rgba(74,103,65,0.08);
+  --accent-mid: rgba(74,103,65,0.15);
+  --moon: #6B8FAB;
+  --moon-light: rgba(107,143,171,0.08);
+  --err: #C0402A;
+  --success: #4A6741;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.wrap { max-width: 860px; margin: 0 auto; padding: 0 32px 120px; }
+
+/* ─── HEADER ─── */
+.header {
+  padding: 56px 0 40px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 32px;
+  border-bottom: 1px solid var(--border);
+}
+.eyebrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(44px, 7vw, 82px);
+  font-weight: 300;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+h1 em { font-style: italic; color: var(--accent); }
+.header-right { text-align: right; padding-bottom: 4px; }
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.live-pill::before {
+  content: '';
+  width: 5px; height: 5px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: blink 2.5s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+.sun-gate-display {
+  font-family: 'Fraunces', serif;
+  font-size: 52px;
+  font-weight: 300;
+  color: var(--accent);
+  line-height: 1;
+}
+.sun-gate-name { font-size: 13px; color: var(--muted); margin-top: 4px; letter-spacing: 0.01em; }
+
+/* ─── PLANET STRIP ─── */
+.planet-strip {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--accent);
+  margin-bottom: 40px;
+  background: var(--surface);
+}
+.pcell {
+  padding: 16px 10px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+  transition: background .15s;
+}
+.pcell:last-child { border-right: none; }
+.pcell.hit-sun { background: var(--accent-light); }
+.pcell.hit-moon { background: var(--moon-light); }
+.p-label {
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  color: var(--muted);
+}
+.p-label.sun  { color: var(--accent); }
+.p-label.moon { color: var(--moon); }
+.p-gate { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 300; color: var(--text); line-height: 1; }
+.p-name { font-size: 9px; color: var(--muted); margin-top: 3px; line-height: 1.3; }
+.p-hit-tag { font-size: 8px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-top: 4px; }
+
+/* ─── STEPS ─── */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 36px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.step {
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-right: 1px solid var(--border);
+  transition: color .2s, background .2s;
+}
+.step:last-child { border-right: none; }
+.step.active { color: var(--text); background: var(--accent-light); }
+.step.done { color: var(--accent); }
+.step-num {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 400;
+  flex-shrink: 0;
+}
+.step.done .step-num { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ─── PANELS ─── */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 40px;
+  display: none;
+  animation: up .35s ease;
+}
+.panel.show { display: block; }
+@keyframes up { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.panel-title {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ─── FORM FIELDS ─── */
+.r2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.r3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.r1 { margin-bottom: 16px; }
+.fld label {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.fld input, .fld select, .fld textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 300;
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  appearance: none;
+  border-radius: 0;
+}
+.fld input:focus, .fld select:focus, .fld textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+.fld input::placeholder, .fld textarea::placeholder { color: var(--muted); opacity: .6; }
+.fld select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238A8A82'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+.fld textarea { height: 72px; resize: none; }
+.hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
+.api-key-note { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+.api-key-note a { color: var(--accent); text-decoration: none; font-weight: 400; }
+.api-key-note a:hover { text-decoration: underline; }
+.api-key-note code { background: var(--card); padding: 1px 5px; font-size: 11px; border-radius: 2px; }
+
+/* ─── BUTTONS ─── */
+.btn-primary {
+  width: 100%;
+  margin-top: 24px;
+  padding: 16px;
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background .2s, transform .1s;
+  border-radius: 0;
+}
+.btn-primary:hover { background: #3A5432; }
+.btn-primary:active { transform: scale(.99); }
+.btn-primary:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 10px 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all .2s;
+}
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+.err-msg { font-size: 12px; color: var(--err); margin-top: 10px; text-align: center; display: none; }
+.err-msg.show { display: block; }
+
+/* ─── CHART PREVIEW ─── */
+.chart-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
+.chart-item {}
+.ci-label {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.ci-value { font-size: 16px; font-weight: 300; color: var(--text); line-height: 1.3; }
+.ci-value.big {
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  font-weight: 300;
+  color: var(--accent);
+}
+.gate-chip {
+  display: inline-block;
+  padding: 3px 7px;
+  border: 1px solid var(--border);
+  margin: 2px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+  transition: all .15s;
+}
+.gate-chip.active { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+/* ─── LOADING ─── */
+#loading { display: none; text-align: center; padding: 100px 0; }
+#loading.show { display: block; }
+.orrery { width: 64px; height: 64px; position: relative; margin: 0 auto 28px; }
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+}
+.orb1 { width: 64px; height: 64px; animation: spin 3.5s linear infinite; border-color: var(--accent-mid); }
+.orb2 { width: 38px; height: 38px; animation: spin 2s linear infinite reverse; border-color: rgba(107,143,171,.3); }
+.orb-dot { position: absolute; border-radius: 50%; top: -3px; left: 50%; transform: translateX(-50%); }
+.orb1 .orb-dot { width: 6px; height: 6px; background: var(--accent); }
+.orb2 .orb-dot { width: 5px; height: 5px; background: var(--moon); }
+.orb-core { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 7px; height: 7px; background: var(--accent); border-radius: 50%; opacity: .6; }
+@keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+.loading-text { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; font-style: italic; color: var(--text); }
+.loading-phase { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 8px; }
+
+/* ─── RESULTS ─── */
+#results { display: none; }
+#results.show { display: block; animation: up .5s ease; }
+.res-header { padding: 48px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+.res-theme {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(28px, 5vw, 52px);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--accent);
+  line-height: 1.1;
+  margin-bottom: 10px;
+}
+.res-meta { font-size: 10px; font-weight: 400; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+
+.highlight {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-light);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--text);
+}
+.highlight .hl-label { font-size: 9px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; display: block; }
+
+.moon-hl {
+  border-left: 3px solid var(--moon);
+  background: var(--moon-light);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--text);
+}
+.moon-hl .hl-label { font-size: 9px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--moon); margin-bottom: 8px; display: block; }
+
+.card { border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden; background: var(--surface); }
+.card-head {
+  padding: 14px 24px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-n { font-size: 9px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); }
+.card-t { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 300; }
+.card-b { padding: 24px; font-size: 15px; line-height: 1.8; color: #3A3A36; }
+.card-b strong { color: var(--text); font-weight: 500; }
+.card-b em { color: var(--accent); }
+
+/* Day rows */
+.day-row { display: grid; grid-template-columns: 100px 1fr; border-bottom: 1px solid var(--border); }
+.day-row:last-child { border-bottom: none; }
+.day-row:hover { background: var(--bg); }
+.day-row.dsun { background: var(--accent-light); }
+.day-row.dmoon { background: var(--moon-light); }
+.day-row.dboth { background: linear-gradient(to right, var(--accent-light), var(--moon-light)); }
+.day-left {
+  padding: 16px 14px;
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 3px;
+}
+.d-name { font-size: 9px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.d-date { font-size: 11px; color: var(--muted); }
+.d-gates { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.d-tag {
+  font-size: 8px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+  padding: 2px 5px; display: inline-block; margin-top: 2px; border-radius: 2px;
+}
+.d-tag.gold { color: var(--accent); background: var(--accent-light); }
+.d-tag.blue { color: var(--moon); background: var(--moon-light); }
+.day-right { padding: 16px 20px; font-size: 15px; line-height: 1.75; color: #3A3A36; }
+
+/* Affirmation */
+.affirmation {
+  padding: 52px 40px;
+  text-align: center;
+  background: var(--accent);
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.affirmation::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(255,255,255,0.06) 0%, transparent 70%);
+}
+.aff-text {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(18px, 3vw, 28px);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.45;
+  color: rgba(255,255,255,0.95);
+  position: relative;
+  z-index: 1;
+}
+.aff-label {
+  margin-top: 16px;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+.aff-q {
+  font-size: 80px;
+  color: rgba(255,255,255,0.08);
+  position: absolute;
+  top: 8px; left: 20px;
+  font-family: Georgia, serif;
+  line-height: 1;
+}
+
+.footer-note {
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+  padding: 16px 0 0;
+  opacity: .5;
+}
+.footer-note a { color: var(--accent); text-decoration: none; }
+
+@media(max-width:640px) {
+  .wrap { padding: 0 20px 80px; }
+  .header { grid-template-columns: 1fr; }
+  .header-right { text-align: left; }
+  .planet-strip { grid-template-columns: repeat(4,1fr); }
+  .pcell:nth-child(n+5) { border-top: 1px solid var(--border); }
+  .steps { grid-template-columns: 1fr; }
+  .r2, .r3 { grid-template-columns: 1fr; }
+  .panel { padding: 24px 20px; }
+  .chart-grid { grid-template-columns: 1fr 1fr; }
+  .affirmation { padding: 36px 24px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <p class="eyebrow">Human Design · Live Transit Guide</p>
+      <h1>Your <em>Aligned</em><br>Week</h1>
+    </div>
+    <div class="header-right">
+      <div class="live-pill">Live ephemeris</div>
+      <div class="sun-gate-display" id="hGate">—</div>
+      <div class="sun-gate-name" id="hGateName">Loading…</div>
+    </div>
+  </div>
+
+  <!-- PLANET STRIP -->
+  <div class="planet-strip" id="pStrip">
+    <div class="pcell"><div class="p-label sun">☀ Sun</div><div class="p-gate">—</div></div>
+    <div class="pcell"><div class="p-label moon">☽ Moon</div><div class="p-gate">—</div></div>
+    <div class="pcell"><div class="p-label merc">☿ Mercury</div><div class="p-gate">—</div></div>
+    <div class="pcell"><div class="p-label venus">♀ Venus</div><div class="p-gate">—</div></div>
+    <div class="pcell"><div class="p-label mars">♂ Mars</div><div class="p-gate">—</div></div>
+    <div class="pcell"><div class="p-label jup">♃ Jupiter</div><div class="p-gate">—</div></div>
+    <div class="pcell"><div class="p-label sat">♄ Saturn</div><div class="p-gate">—</div></div>
+  </div>
+
+  <!-- STEP INDICATOR -->
+  <div class="steps" id="stepBar">
+    <div class="step active" id="s1"><div class="step-num">1</div>Birth Details</div>
+    <div class="step" id="s2"><div class="step-num">2</div>Your Chart</div>
+    <div class="step" id="s3"><div class="step-num">3</div>Weekly Guide</div>
+  </div>
+
+  <!-- PANEL 1: BIRTH DATA -->
+  <div class="panel show" id="panel1">
+    <div class="panel-title">
+      <span>Step 1 — Enter your birth details</span>
+    </div>
+
+    <div class="r2">
+      <div class="fld">
+        <label>Date of Birth</label>
+        <input type="date" id="dob" max="2010-01-01">
+      </div>
+      <div class="fld">
+        <label>Time of Birth</label>
+        <input type="time" id="tob" placeholder="14:32">
+        <p class="hint">As precise as possible — even minutes matter</p>
+      </div>
+    </div>
+    <div class="r1 fld">
+      <label>City of Birth</label>
+      <input type="text" id="city" placeholder="e.g. Sydney, Melbourne, London, New York">
+    </div>
+    <div class="r1 fld">
+      <label>Focus for this week (optional)</label>
+      <textarea id="focus" placeholder="e.g. launching something, a big decision, relationships, rest…"></textarea>
+    </div>
+
+    <button class="btn-primary" id="calcBtn" onclick="calculateChart()">Calculate my chart →</button>
+    <div class="err-msg" id="err1">Please fill in your date of birth, time, and city.</div>
+  </div>
+
+  <!-- PANEL 2: CHART REVIEW -->
+  <div class="panel" id="panel2">
+    <div class="panel-title">
+      <span>Step 2 — Your Human Design Chart</span>
+      <button class="btn-secondary" style="margin:0;padding:6px 14px;font-size:13px;" onclick="backToStep1()">← Edit</button>
+    </div>
+
+    <div id="chartResult"></div>
+
+    <button class="btn-primary" id="guideBtn" onclick="generateGuide()" style="margin-top:24px;">Generate my aligned week →</button>
+    <div class="err-msg" id="err2"></div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading">
+    <div class="orrery">
+      <div class="orb orb1"><div class="orb-dot"></div></div>
+      <div class="orb orb2"><div class="orb-dot"></div></div>
+      <div class="orb-core"></div>
+    </div>
+    <p class="loading-text" id="loadingText">Calculating your chart…</p>
+    <p class="loading-phase" id="loadingPhase">Contacting ephemeris servers</p>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results"></div>
+
+</div>
+<script>
+// ════════════════════════════════════════════
+// HD GATE WHEEL — ecliptic degree → gate
+// ════════════════════════════════════════════
+const HD_WHEEL = [
+  41,19,13,49,30,55,37,63,22,36,25,17,21,51,42,3,
+  27,24,2,23,8,20,16,35,45,12,15,52,39,53,62,56,
+  31,7,4,29,59,40,64,47,6,46,18,48,57,32,50,28,
+  44,1,43,14,34,9,5,26,11,10,58,38,54,61,60,41
+];
+const GATE_NAMES = {
+  1:"Creative",2:"Receptive",3:"Difficulty at the Start",4:"Formulization",
+  5:"Fixed Rhythms",6:"Friction",7:"Role of the Self",8:"Contribution",
+  9:"Taming Power",10:"Treading",11:"Ideas",12:"Standstill",
+  13:"Listener",14:"Power Skills",15:"Extremes",16:"Skills",
+  17:"Opinion",18:"Correction",19:"Wanting",20:"Contemplation",
+  21:"Hunter/Huntress",22:"Openness",23:"Assimilation",24:"Rationalization",
+  25:"Innocence",26:"Egoist",27:"Nourishment",28:"Game Player",
+  29:"Perseverance",30:"Recognition",31:"Influence",32:"Duration",
+  33:"Privacy",34:"Power",35:"Change",36:"Crisis",
+  37:"Friendship",38:"Opposition",39:"Provocation",40:"Aloneness",
+  41:"Contraction",42:"Increase",43:"Breakthrough",44:"Coming to Meet",
+  45:"Gatherer",46:"Pushing Upward",47:"Realization",48:"Depth",
+  49:"Revolution",50:"Values",51:"Arousal",52:"Stillness",
+  53:"Development",54:"Ambition",55:"Abundance",56:"Stimulation",
+  57:"Intuitive Clarity",58:"Joy",59:"Sexuality",60:"Limitation",
+  61:"Inner Truth",62:"Detail",63:"After Completion",64:"Confusion"
+};
+const EARTH_PAIRS = {1:2,2:1,3:60,4:49,5:35,6:36,7:13,8:14,9:16,10:15,11:12,12:11,13:7,14:8,15:10,16:9,17:18,18:17,19:33,20:34,21:45,22:47,23:43,24:44,25:46,26:45,27:28,28:27,29:30,30:29,31:41,32:42,33:19,34:20,35:5,36:6,37:40,38:39,39:38,40:37,41:31,42:32,43:23,44:24,45:26,46:25,47:22,48:21,49:4,50:3,51:57,52:58,53:54,54:53,55:59,56:60,57:51,58:52,59:55,60:56,61:62,62:61,63:64,64:63};
+const CHANNELS = {"1-8":"Inspiration","2-14":"The Beat","3-60":"Mutation","4-63":"Logic","5-15":"Rhythm","6-59":"Mating","7-31":"The Alpha","9-52":"Concentration","10-20":"Awakening","11-56":"Curiosity","12-22":"Openness","13-33":"The Prodigal","16-48":"Wavelength","17-62":"Acceptance","18-58":"Judgment","19-49":"Synthesis","20-57":"Brain Wave","21-45":"Money","23-43":"Structuring","24-61":"Awareness","25-51":"Initiation","26-44":"Surrender","27-50":"Preservation","28-38":"Struggle","29-46":"Discovery","30-41":"Recognition","32-54":"Transformation","34-57":"Power","35-36":"Transitoriness","37-40":"Community","39-55":"Emoting","42-53":"Maturation","47-64":"Abstraction"};
+
+function degToGate(deg) {
+  deg = ((deg % 360) + 360) % 360;
+  return HD_WHEEL[Math.floor(deg / 5.625) % 64];
+}
+function degToLine(deg) {
+  deg = ((deg % 360) + 360) % 360;
+  return Math.floor((deg % 5.625) / 0.9375) + 1;
+}
+function getChannel(g, userGates) {
+  for (const [pair, name] of Object.entries(CHANNELS)) {
+    const [a,b] = pair.split('-').map(Number);
+    if (a===g && userGates.includes(b)) return name;
+    if (b===g && userGates.includes(a)) return name;
+  }
+  return null;
+}
+
+// ════════════════════════════════════════════
+// EPHEMERIS — fetch 7 days of planetary positions
+// ════════════════════════════════════════════
+async function fetchWeekTransits() {
+  const today = new Date();
+  today.setHours(12,0,0,0);
+  const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const bodies = 'sun,moon,mercury,venus,mars,jupiter,saturn';
+
+  const results = await Promise.all(
+    Array.from({length:7}, (_,i) => {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      const iso = d.toISOString().split('.')[0]+'Z';
+      return fetch(`https://ephemeris.fyi/ephemeris/get_ephemeris_data?bodies=${bodies}&latitude=0&longitude=0&datetime=${iso}`)
+        .then(r => r.json())
+        .then(data => {
+          const pos = {};
+          for (const [name, info] of Object.entries(data.bodies || data)) {
+            const deg = info.longitude ?? info.position?.longitude ?? 0;
+            pos[name.toLowerCase()] = { gate: degToGate(deg), line: degToLine(deg), deg: parseFloat(deg.toFixed(2)), gname: GATE_NAMES[degToGate(deg)] };
+          }
+          return { date:d, dayName: dayNames[d.getDay()], dateStr: d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}), pos };
+        });
+    })
+  );
+  return results;
+}
+
+// ════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════
+let weekTransits = null;
+let chartData = null;
+let userGates = [];
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+async function init() {
+  try {
+    weekTransits = await fetchWeekTransits();
+    const today = weekTransits[0];
+    const sun = today.pos.sun;
+
+    document.getElementById('hGate').textContent = sun?.gate ?? '?';
+    document.getElementById('hGateName').textContent = sun?.gname ?? '';
+    renderStrip(today.pos, []);
+  } catch(e) {
+    console.warn('Ephemeris init failed:', e);
+    document.getElementById('hGateName').textContent = 'API unavailable';
+    // Use fallback
+    weekTransits = buildFallback();
+    renderStrip(weekTransits[0].pos, []);
+  }
+}
+
+function renderStrip(pos, uGates) {
+  const planets = [
+    {k:'sun',lbl:'☀ Sun',cls:'sun'},
+    {k:'moon',lbl:'☽ Moon',cls:'moon'},
+    {k:'mercury',lbl:'☿ Mercury',cls:'merc'},
+    {k:'venus',lbl:'♀ Venus',cls:'venus'},
+    {k:'mars',lbl:'♂ Mars',cls:'mars'},
+    {k:'jupiter',lbl:'♃ Jupiter',cls:'jup'},
+    {k:'saturn',lbl:'♄ Saturn',cls:'sat'},
+  ];
+  document.getElementById('pStrip').innerHTML = planets.map(p => {
+    const d = pos[p.k];
+    const hit = d && uGates.includes(d.gate);
+    const hitCls = hit ? (p.k==='moon' ? 'hit-moon' : 'hit-sun') : '';
+    return `<div class="pcell ${hitCls}">
+      <div class="p-label ${p.cls}">${p.lbl}</div>
+      <div class="p-gate">${d?.gate ?? '—'}</div>
+      <div class="p-name">${d?.gname ?? ''}</div>
+      ${hit ? '<div class="p-hit-tag">Your gate</div>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function buildFallback() {
+  // Anchor: Sun ~346° on Mar 6 2026 = Gate 63
+  const anchor = new Date(2026,2,6,12,0,0);
+  const today = new Date(); today.setHours(12,0,0,0);
+  const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  return Array.from({length:7},(_,i)=>{
+    const d = new Date(today); d.setDate(today.getDate()+i);
+    const diff = (d-anchor)/86400000;
+    const sD = 345 + diff*0.9856;
+    const mD = 180 + diff*13.176;
+    const sg=degToGate(sD), mg=degToGate(mD);
+    return {date:d,dayName:dayNames[d.getDay()],dateStr:d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}),
+      pos:{sun:{gate:sg,line:degToLine(sD),gname:GATE_NAMES[sg]},moon:{gate:mg,line:degToLine(mD),gname:GATE_NAMES[mg]}}};
+  });
+}
+
+// ════════════════════════════════════════════
+// STEP 1 — Calculate chart from birth data
+// ════════════════════════════════════════════
+async function calculateChart() {
+  const dob  = document.getElementById('dob').value;
+  const tob  = document.getElementById('tob').value;
+  const city = document.getElementById('city').value.trim();
+  const err  = document.getElementById('err1');
+
+  if (!dob || !tob || !city) {
+    err.textContent = 'Please fill in your date of birth, time, and city.';
+    err.classList.add('show');
+    return;
+  }
+  err.classList.remove('show');
+
+  showLoading('Calculating your birth chart…', 'Reading your natal positions');
+
+  try {
+    // Calls our own server-side proxy at /api/chart
+    // The HD API key stays secret on the server — users never see it
+    const resp = await fetch('/api/chart', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date: dob, time: tob, city })
+    });
+
+    if (!resp.ok) {
+      const errData = await resp.json().catch(() => ({}));
+      throw new Error(errData.error || `Server error ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    chartData = parseHubResponse(data);
+
+  } catch(e) {
+    console.error('Chart error:', e);
+    hideLoading();
+    document.getElementById('panel1').style.display = '';
+    err.textContent = `Could not calculate your chart: ${e.message}`;
+    err.classList.add('show');
+    return;
+  }
+
+  userGates = chartData.gates || [];
+  renderStrip(weekTransits[0].pos, userGates);
+  hideLoading();
+  showPanel2();
+}
+
+function parseHubResponse(data) {
+  // humandesignhub.app response shape
+  // data.type, data.authority, data.profile, data.incarnationCross
+  // data.gates = array of {gate, line, planet, type} or just numbers
+  // data.channels = array of {channel:"1-8", name:"..."} or similar
+  // data.centers = {Sacral:{defined:true}, ...} or array
+  const gates = extractGates(data);
+  const channels = extractChannels(data);
+  const centers = extractCenters(data);
+  return {
+    type:      normaliseType(data.type || data.energyType || data.auraType),
+    authority: data.authority || data.innerAuthority || data.decisionMaking || '?',
+    profile:   normaliseProfile(data.profile),
+    cross:     data.incarnationCross || data.cross?.name || data.cross || '',
+    definition:data.definition || data.splitDefinition || '',
+    strategy:  data.strategy || '',
+    gates,
+    channels,
+    centers,
+    raw: data
+  };
+}
+
+function parseNLResponse(data) {
+  // humandesignapi.nl response shape (Advanced plan)
+  // data.energy_type, data.profile, data.authority, data.incarnation_cross
+  // data.gates = [{gate_number, line, ...}]
+  // data.channels = [{channel:"1-8",...}]
+  // data.centers = [{center:"Sacral", defined:true,...}]
+  const gates = [];
+  if (data.gates) {
+    for (const g of data.gates) {
+      const n = g.gate_number ?? g.gate ?? g.number ?? (typeof g === 'number' ? g : null);
+      if (n && n > 0 && n < 65) gates.push(n);
+    }
+  }
+  const channels = (data.channels || []).map(c => c.channel || c.id || c);
+  const centers = (data.centers || [])
+    .filter(c => c.defined === true || c.defined === 'true' || c.is_defined)
+    .map(c => c.center || c.name || c);
+  return {
+    type:      normaliseType(data.energy_type || data.type),
+    authority: data.authority || data.inner_authority || '?',
+    profile:   normaliseProfile(data.profile),
+    cross:     data.incarnation_cross || data.cross || '',
+    definition:data.definition || '',
+    strategy:  data.strategy || '',
+    gates:     [...new Set(gates)],
+    channels,
+    centers,
+    raw: data
+  };
+}
+
+// ── Generic extractors for varied API response shapes ──
+function extractGates(data) {
+  const gates = new Set();
+  // From gates array
+  if (Array.isArray(data.gates)) {
+    for (const g of data.gates) {
+      const n = typeof g === 'object' ? (g.gate ?? g.number ?? g.gate_number) : g;
+      if (n > 0 && n < 65) gates.add(parseInt(n));
+    }
+  }
+  // From channels (each channel implies 2 gates)
+  if (Array.isArray(data.channels)) {
+    for (const ch of data.channels) {
+      const id = ch.channel || ch.id || ch.name || (typeof ch === 'string' ? ch : '');
+      const parts = id.match(/(\d+)[^0-9]+(\d+)/);
+      if (parts) { gates.add(parseInt(parts[1])); gates.add(parseInt(parts[2])); }
+    }
+  }
+  return [...gates].filter(g => g > 0 && g < 65).sort((a,b) => a-b);
+}
+
+function extractChannels(data) {
+  if (!Array.isArray(data.channels)) return [];
+  return data.channels.map(ch => {
+    if (typeof ch === 'string') return ch;
+    return ch.channel || ch.id || ch.name || '';
+  }).filter(Boolean);
+}
+
+function extractCenters(data) {
+  if (!data.centers) return [];
+  if (Array.isArray(data.centers)) {
+    return data.centers
+      .filter(c => typeof c === 'string' || c.defined === true || c.defined === 'true')
+      .map(c => typeof c === 'string' ? c : (c.center || c.name || c.id || ''));
+  }
+  // Object format: {Sacral: {defined: true}, Head: {defined: false}, ...}
+  return Object.entries(data.centers)
+    .filter(([, v]) => v === true || v?.defined === true)
+    .map(([k]) => k);
+}
+
+function normaliseType(raw) {
+  if (!raw) return '?';
+  const t = raw.toString().toLowerCase().trim();
+  if (t.includes('manifesting') || t.includes('mani gen') || t.includes('manigen')) return 'Manifesting Generator';
+  if (t.includes('generator')) return 'Generator';
+  if (t.includes('projector')) return 'Projector';
+  if (t.includes('manifestor')) return 'Manifestor';
+  if (t.includes('reflector')) return 'Reflector';
+  return raw; // return as-is if unrecognised
+}
+
+function normaliseProfile(raw) {
+  if (!raw) return '?';
+  if (typeof raw === 'object') {
+    const lines = raw.lines || raw.profile_lines || [];
+    if (lines.length >= 2) return `${lines[0]}/${lines[1]}`;
+    return raw.name || raw.label || '?';
+  }
+  return raw.toString();
+}
+
+function showPanel2() {
+  document.getElementById('panel1').classList.remove('show');
+  setStep(2);
+
+  const gates = chartData.gates || [];
+  const channels = chartData.channels || [];
+  const centers = chartData.centers || [];
+  const allNums = Array.from({length:64}, (_,i) => i+1);
+
+  // Build channels display
+  const channelStr = channels.length
+    ? channels.map(ch => {
+        const id = typeof ch === 'string' ? ch : (ch.channel || ch.id || '');
+        const name = CHANNELS[id] || (typeof ch === 'object' && ch.name) || '';
+        return `<span class="gate-chip active" style="font-size:10px">${id}${name ? ' · '+name : ''}</span>`;
+      }).join('')
+    : '<span style="color:var(--muted);font-style:italic;font-size:14px">Not returned by API</span>';
+
+  // Build centers display
+  const ALL_CENTERS = ['Head','Ajna','Throat','G Center','Heart/Ego','Sacral','Solar Plexus','Spleen','Root'];
+  const centerStr = ALL_CENTERS.map(c => {
+    const isDefined = centers.some(d => d && d.toString().toLowerCase().includes(c.toLowerCase().split('/')[0].trim()));
+    return `<span class="gate-chip ${isDefined ? 'active' : ''}" style="font-size:10px">${c}</span>`;
+  }).join('');
+
+  document.getElementById('chartResult').innerHTML = `
+    <div class="chart-grid">
+      <div class="chart-item">
+        <div class="ci-label">Type</div>
+        <div class="ci-value big">${chartData.type}</div>
+      </div>
+      <div class="chart-item">
+        <div class="ci-label">Authority</div>
+        <div class="ci-value">${chartData.authority}</div>
+      </div>
+      <div class="chart-item">
+        <div class="ci-label">Profile</div>
+        <div class="ci-value">${chartData.profile}</div>
+      </div>
+      ${chartData.cross ? `<div class="chart-item" style="grid-column:1/-1">
+        <div class="ci-label">Incarnation Cross</div>
+        <div class="ci-value">${chartData.cross}</div>
+      </div>` : ''}
+      ${chartData.strategy ? `<div class="chart-item" style="grid-column:1/-1">
+        <div class="ci-label">Strategy</div>
+        <div class="ci-value" style="font-style:italic;color:var(--gold)">${chartData.strategy}</div>
+      </div>` : ''}
+      ${chartData.definition ? `<div class="chart-item" style="grid-column:1/-1">
+        <div class="ci-label">Definition</div>
+        <div class="ci-value">${chartData.definition}</div>
+      </div>` : ''}
+    </div>
+
+    <div style="margin-top:20px;">
+      <div class="ci-label" style="margin-bottom:10px">Defined Centers (${centers.length})</div>
+      <div>${centerStr}</div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <div class="ci-label" style="margin-bottom:10px">Defined Gates (${gates.length})</div>
+      <div>${allNums.map(n => `<span class="gate-chip ${gates.includes(n)?'active':''}" title="${GATE_NAMES[n]||''}">${n}</span>`).join('')}</div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <div class="ci-label" style="margin-bottom:10px">Defined Channels (${channels.length})</div>
+      <div>${channelStr}</div>
+    </div>
+
+    <details style="margin-top:20px;">
+      <summary style="font-family:'Syne',sans-serif;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);cursor:pointer;">Raw API response</summary>
+      <pre style="font-size:10px;color:var(--muted);margin-top:10px;overflow:auto;max-height:200px;padding:12px;background:var(--card);border:1px solid var(--border)">${JSON.stringify(chartData.raw, null, 2)}</pre>
+    </details>
+  `;
+
+  document.getElementById('panel2').classList.add('show');
+}
+
+function backToStep1() {
+  document.getElementById('panel2').classList.remove('show');
+  document.getElementById('panel1').classList.add('show');
+  setStep(1);
+}
+
+// ════════════════════════════════════════════
+// STEP 2 — Generate AI weekly guide
+// ════════════════════════════════════════════
+async function generateGuide() {
+  document.getElementById('panel2').classList.remove('show');
+  showLoading('Reading your transits…','Weaving your chart with this week\'s planetary field');
+
+  const focus = document.getElementById('focus').value.trim();
+  const type = chartData.type;
+  const auth = chartData.authority;
+  const profile = chartData.profile;
+  const cross = chartData.cross;
+  const gates = chartData.gates;
+  const centers = chartData.centers;
+
+  setStep(3);
+
+  // Build day data
+  const days = weekTransits.map(d => {
+    const sun = d.pos.sun, moon = d.pos.moon;
+    const sunHit = gates.includes(sun?.gate);
+    const moonHit = gates.includes(moon?.gate);
+    const sunCh = sun ? getChannel(sun.gate, gates) : null;
+    const moonCh = moon ? getChannel(moon.gate, gates) : null;
+    return { ...d, sunHit, moonHit, sunCh, moonCh };
+  });
+
+  const todayPos = weekTransits[0].pos;
+  const transitBlock = days.map(d =>
+    `${d.dayName} ${d.dateStr}: ☀ Gate ${d.pos.sun?.gate} (${d.pos.sun?.gname}) L${d.pos.sun?.line}${d.sunHit?' ← YOUR GATE':''} | ☽ Gate ${d.pos.moon?.gate} (${d.pos.moon?.gname})${d.moonHit?' ← YOUR GATE':''}${d.sunCh?` | ☀ completes ${d.sunCh} channel`:''}${d.moonCh?` | ☽ completes ${d.moonCh} channel`:''}`
+  ).join('\n');
+
+  const hitSummary = days.filter(d=>d.sunHit||d.moonHit||d.sunCh||d.moonCh)
+    .map(d=>`${d.dayName}: ${[d.sunHit&&`☀ activates your Gate ${d.pos.sun?.gate}`,d.moonHit&&`☽ activates your Gate ${d.pos.moon?.gate}`,d.sunCh&&`☀ completes ${d.sunCh}`,d.moonCh&&`☽ completes ${d.moonCh}`].filter(Boolean).join(', ')}`)
+    .join('\n') || 'No direct hits — guidance through channel activations and background field';
+
+  const prompt = `You are a master Human Design analyst. Generate a deeply specific, transit-aware weekly guide using real astronomical data.
+
+BIRTH CHART (calculated from birth data):
+Type: ${type} | Authority: ${auth} | Profile: ${profile} | Cross: ${cross||'?'}
+Defined Gates: ${gates.join(', ')}
+Defined Centers: ${Array.isArray(centers) ? centers.join(', ') : centers}
+Focus: ${focus||'general life alignment'}
+
+THIS WEEK'S LIVE PLANETARY POSITIONS:
+${transitBlock}
+
+PERSONAL CHART ACTIVATIONS THIS WEEK:
+${hitSummary}
+
+Background field: Mercury Gate ${todayPos.mercury?.gate||'?'}, Venus Gate ${todayPos.venus?.gate||'?'}, Mars Gate ${todayPos.mars?.gate||'?'}, Jupiter Gate ${todayPos.jupiter?.gate||'?'}, Saturn Gate ${todayPos.saturn?.gate||'?'}
+
+Instructions: Reference SPECIFIC gate names. Explain WHY each transit matters for this type/authority. Flag channel completions as especially potent. Moon gate changes every ~10hr — treat moon hits as peak activation windows. Be concrete, not generic.
+
+Return ONLY valid JSON, no markdown:
+{"weekTheme":"5-7 word theme using actual gate names","sunNote":"2 sentences: Sun Gate ${todayPos.sun?.gate} ${todayPos.sun?.gname} and what it means for ${type}s","moonNote":"2 sentences about Moon's journey this week and the most powerful moon moment for this person","strategy":"2 sentences: concrete strategy for ${type} with ${auth} Authority this week","days":[${days.map(d=>`{"day":"${d.dayName}","date":"${d.dateStr}","sunGate":${d.pos.sun?.gate},"moonGate":${d.pos.moon?.gate},"sunHit":${!!d.sunHit},"moonHit":${!!d.moonHit},"guidance":"2 sentences. Be specific to Gate ${d.pos.sun?.gate} ${d.pos.sun?.gname} and their type. ${d.sunHit?'Their Sun gate is activated — make this feel significant.':''}${d.moonHit?'Their Moon gate is activated — call out this window.':''}${d.sunCh?`${d.sunCh} channel is completed by transit.`:''}"}`).join(',')}],"bestDays":"1-2 days with exact reason based on gate themes and type","backgroundField":"1 sentence on Mercury/Venus/Mars/Jupiter/Saturn backdrop","notSelf":"1 sentence: specific not-self watch for ${type} given dominant gates this week","affirmation":"12-16 word affirmation rooted in Sun Gate ${todayPos.sun?.gate} and their design"}`;
+
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:prompt}]})
+    });
+    const d = await r.json();
+    const raw = d.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+    const guide = JSON.parse(raw);
+    hideLoading();
+    renderResults(guide, type, auth, profile, gates, days, todayPos);
+  } catch(e) {
+    console.error(e);
+    hideLoading();
+    document.getElementById('panel2').classList.add('show');
+    document.getElementById('err2').textContent = 'Something went wrong — please try again.';
+    document.getElementById('err2').classList.add('show');
+    setStep(2);
+  }
+}
+
+function renderResults(g, type, auth, profile, gates, days, todayPos) {
+  const profStr = profile ? ` · ${profile}` : '';
+  const sunGate = todayPos.sun?.gate;
+  const sunName = todayPos.sun?.gname;
+
+  const daysHTML = (g.days || days).map(d => {
+    const sh = d.sunHit ?? gates.includes(d.sunGate);
+    const mh = d.moonHit ?? gates.includes(d.moonGate);
+    let cls = sh && mh ? 'dboth' : sh ? 'dsun' : mh ? 'dmoon' : '';
+    const sunCh = getChannel(d.sunGate || d.pos?.sun?.gate, gates);
+    const moonCh = getChannel(d.moonGate || d.pos?.moon?.gate, gates);
+    return `
+      <div class="day-row ${cls}">
+        <div class="day-left">
+          <span class="d-name">${d.day||d.dayName}</span>
+          <span class="d-date">${d.date||d.dateStr}</span>
+          <span class="d-gates">☀${d.sunGate||d.pos?.sun?.gate} ☽${d.moonGate||d.pos?.moon?.gate}</span>
+          ${sh?'<span class="d-tag gold">☀ Your gate</span>':''}
+          ${mh?'<span class="d-tag blue">☽ Moon hit</span>':''}
+          ${sunCh?`<span class="d-tag gold" style="font-size:6px">${sunCh}</span>`:''}
+          ${moonCh?`<span class="d-tag blue" style="font-size:6px">${moonCh}</span>`:''}
+        </div>
+        <div class="day-right">${d.guidance}</div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('results').innerHTML = `
+    <div class="res-header">
+      <div class="res-theme">${g.weekTheme}</div>
+      <div class="res-meta">${type}${profStr} · ${auth} Authority · ☀ Gate ${sunGate}: ${sunName}</div>
+    </div>
+    <div class="highlight">
+      <span class="hl-label">☀ Sun in Gate ${sunGate} · ${sunName}</span>
+      ${g.sunNote}
+    </div>
+    <div class="moon-hl">
+      <span class="hl-label">☽ Moon transits this week</span>
+      ${g.moonNote}
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-n">01</span><span class="card-t">Your Strategy This Week</span></div>
+      <div class="card-b">${g.strategy}</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-n">02</span><span class="card-t">Day by Day · Sun & Moon Gates</span></div>
+      ${daysHTML}
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-n">03</span><span class="card-t">Your Best Windows for Action</span></div>
+      <div class="card-b">${g.bestDays}</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-n">04</span><span class="card-t">Planetary Background Field</span></div>
+      <div class="card-b">${g.backgroundField}</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-n">05</span><span class="card-t">Not-Self Watch</span></div>
+      <div class="card-b">${g.notSelf}</div>
+    </div>
+    <div class="affirmation">
+      <div class="aff-q">"</div>
+      <div class="aff-text">${g.affirmation}</div>
+      <div class="aff-label">Gate ${sunGate} · Your Week</div>
+    </div>
+    <div style="text-align:center;margin-top:28px;">
+      <button class="btn-secondary" onclick="resetAll()">← Start over</button>
+    </div>
+    <p class="footer-note">Birth chart via <a href="https://humandesignhub.app" target="_blank">humandesignhub.app</a> · Transits via <a href="https://ephemeris.fyi" target="_blank">ephemeris.fyi</a></p>
+  `;
+  document.getElementById('results').classList.add('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════
+function showLoading(text, phase) {
+  document.getElementById('panel1').style.display = 'none';
+  document.getElementById('panel2').classList.remove('show');
+  document.getElementById('loading').classList.add('show');
+  document.getElementById('loadingText').textContent = text;
+  document.getElementById('loadingPhase').textContent = phase;
+}
+function hideLoading() {
+  document.getElementById('loading').classList.remove('show');
+  document.getElementById('panel1').style.display = '';
+}
+function setLoadingPhase(p) { document.getElementById('loadingPhase').textContent = p; }
+function setStep(n) {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById('s'+i);
+    el.className = 'step' + (i<n?' done':i===n?' active':'');
+    el.querySelector('.step-num').textContent = i<n ? '✓' : i;
+  });
+}
+function resetAll() {
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('panel1').style.display = '';
+  document.getElementById('panel1').classList.add('show');
+  if (weekTransits) renderStrip(weekTransits[0].pos, []);
+  setStep(1);
+  chartData = null; userGates = [];
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// Boot
+init();
+</script>
+</body>
+</html>
