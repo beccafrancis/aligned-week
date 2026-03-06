@@ -1006,7 +1006,8 @@ Return ONLY valid JSON, no markdown:
     });
     const d = await r.json();
     const raw = d.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
-    const guide = JSON.parse(raw);
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    const guide = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
     hideLoading();
     renderResults(guide, type, auth, profile, gates, days, todayPos);
   } catch(e) {
