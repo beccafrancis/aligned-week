@@ -741,6 +741,24 @@ async function calculateChart() {
 }
 
 function parseHubResponse(data) {
+  // bodygraphchart.com format
+  if (data.Properties) {
+    const p = data.Properties;
+    return {
+      type: p.Type?.option || '?',
+      authority: p.InnerAuthority?.option || '?',
+      profile: p.Profile?.id || '?',
+      definedCenters: (data.DefinedCenters || []).map(c => c.replace(' center','')).map(c => c.charAt(0).toUpperCase() + c.slice(1)),
+      gates: data.Gates || [],
+      channels: data.Channels || [],
+      incarnationCross: p.IncarnationCross?.option || '',
+      strategy: p.Strategy?.option || '',
+      definition: p.Definition?.option || '',
+      chartUrl: data.ChartUrl || null
+    };
+  }
+  // fallback
+  return {
   // humandesignhub.app response shape
   // data.type, data.authority, data.profile, data.incarnationCross
   // data.gates = array of {gate, line, planet, type} or just numbers
