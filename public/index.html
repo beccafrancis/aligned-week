@@ -1077,7 +1077,7 @@ function showPanel2() {
 
     <div style="margin-top:20px"><div class="ci-label" style="margin-bottom:10px">Energy Centers</div><div>${centerStr}</div></div>
 
-    <div style="margin-top:20px"><div class="ci-label" style="margin-bottom:10px">Defined Gates (${gates.length})</div><div>${allNums.map(n => "<span class="gate-chip "+( gates.includes(n)?"active"":""")+">"+n+"</span>").join("")}</div></div>
+    <div style="margin-top:20px"><div class="ci-label" style="margin-bottom:10px">Defined Gates (${gates.length})</div><div>${allNums.map(n => "<span class=\"gate-chip "+( gates.includes(n)?"active\"":"\"")+">"+n+"</span>").join("")}</div></div>
 
     <div style="margin-top:20px"><div class="ci-label" style="margin-bottom:10px">Defined Channels (${channels.length})</div><div>${channelStr}</div></div>
     </div>
