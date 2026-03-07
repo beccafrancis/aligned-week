@@ -949,7 +949,7 @@ function showPanel2() {
   const definedCenterKeys = new Set(
     centers.map(c => CENTER_MAP[c.toLowerCase().trim()]).filter(Boolean)
   );
-
+(function(){const dc=definedCenterKeys;const d1='#2D5A3D',op='#e8ede8',sk='#2D5A3D';const ts=k=>dc.has(k)?d1:op;const tf=k=>dc.has(k)?'#fff':'#888';const el=(tag,attrs)=>{const p=Object.entries(attrs).map(([k,v])=>k+'="'+v+'"').join(' ');return'<'+tag+' '+p+'/>';};const tx=(x,y,t,f)=>'<text x="'+x+'" y="'+y+'" text-anchor="middle" font-size="9" font-family="inherit" fill="'+f+'">'+t+'</text>';let s='';s+=el('ellipse',{cx:150,cy:28,rx:34,ry:20,fill:ts('Head'),stroke:sk,'stroke-width':'1.5'});s+=tx(150,32,'Head',tf('Head'));s+=el('ellipse',{cx:150,cy:76,rx:34,ry:20,fill:ts('Ajna'),stroke:sk,'stroke-width':'1.5'});s+=tx(150,80,'Ajna',tf('Ajna'));s+=el('rect',{x:116,y:110,width:68,height:32,rx:4,fill:ts('Throat'),stroke:sk,'stroke-width':'1.5'});s+=tx(150,130,'Throat',tf('Throat'));s+=el('rect',{x:132,y:156,width:36,height:36,rx:3,transform:'rotate(45 150 174)',fill:ts('G'),stroke:sk,'stroke-width':'1.5'});s+=tx(150,178,'G',tf('G'));s+=el('ellipse',{cx:98,cy:174,rx:22,ry:18,fill:ts('Heart'),stroke:sk,'stroke-width':'1.5'});s+=tx(98,178,'Heart',tf('Heart'));s+=el('rect',{x:116,y:218,width:68,height:32,rx:4,fill:ts('Sacral'),stroke:sk,'stroke-width':'1.5'});s+=tx(150,238,'Sacral',tf('Sacral'));s+=el('ellipse',{cx:202,cy:250,rx:26,ry:20,fill:ts('Solar Plexus'),stroke:sk,'stroke-width':'1.5'});s+='<text x="202" y="247" text-anchor="middle" font-size="7" font-family="inherit" fill="'+tf('Solar Plexus')+'">Solar</text><text x="202" y="257" text-anchor="middle" font-size="7" font-family="inherit" fill="'+tf('Solar Plexus')+'">Plexus</text>';s+=el('ellipse',{cx:98,cy:250,rx:26,ry:20,fill:ts('Spleen'),stroke:sk,'stroke-width':'1.5'});s+=tx(98,254,'Spleen',tf('Spleen'));s+=el('rect',{x:116,y:288,width:68,height:32,rx:4,fill:ts('Root'),stroke:sk,'stroke-width':'1.5'});s+=tx(150,308,'Root',tf('Root'));[[150,48,150,56],[150,96,150,110],[150,142,150,154],[150,194,150,218],[150,250,150,288],[120,174,108,174],[172,190,188,232],[116,234,124,234],[184,234,176,234]].forEach(l=>s+=el('line',{x1:l[0],y1:l[1],x2:l[2],y2:l[3],stroke:sk,'stroke-width':'1',opacity:'0.3'}));const w=document.getElementById('bgsvg-wrap');if(w)w.innerHTML='<svg viewBox="0 0 300 340" width="200" style="max-width:100%;display:block;margin:0 auto">'+s+'</svg>';})();
   const centerHTML = ALL_CENTERS.map(({key, label}) => {
     const def = definedCenterKeys.has(key);
     return `<div class="center-pip ${def ? 'def' : 'open'}">
@@ -1000,6 +1000,7 @@ function showPanel2() {
     </div>
 
     <div style="margin-bottom:28px">
+    <div style="text-align:center;margin-bottom:20px" id="bgsvg-wrap"></div>
       <div class="ci-label" style="margin-bottom:12px">Defined Centers</div>
       ${chartData.chartUrl ? `<div style="margin-bottom:24px;text-align:center"><img src="${chartData.chartUrl}" alt="Your Human Design Chart" style="max-width:100%;width:340px;border-radius:4px;opacity:0.92" /></div>` : ''}
       <div class="centers-grid">${centerHTML}</div>
