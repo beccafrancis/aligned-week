@@ -1193,27 +1193,6 @@ function renderResults(g, type, auth, profile, gates, days, todayPos) {
       <div class="aff-text">${g.affirmation}</div>
       <div class="aff-label">Gate ${sunGate} · Your Week</div>
     </div>
-    <div style="margin:40px 0;border:1px solid var(--border-accent);padding:36px 32px;background:var(--accent-light);position:relative;overflow:hidden">
-      <div style="font-size:9px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:20px">Your Week at a Glance</div>
-      <div style="font-family:'Fraunces',serif;font-size:clamp(18px,3vw,28px);font-weight:300;color:var(--text);line-height:1.3;margin-bottom:20px">${g.focusSentence}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px">
-        <div>
-          <div style="font-size:8px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">Energy</div>
-          <div style="font-size:14px;font-weight:300;color:var(--text)">${g.energyTheme}</div>
-        </div>
-        <div>
-          <div style="font-size:8px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">Best Days</div>
-          <div style="font-size:14px;font-weight:300;color:var(--text)">${g.bestDays}</div>
-        </div>
-        <div>
-          <div style="font-size:8px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:#C0402A;margin-bottom:6px">Watch For</div>
-          <div style="font-size:14px;font-weight:300;color:var(--text)">${g.trapToAvoid}</div>
-        </div>
-      </div>
-      <div style="font-family:'Fraunces',serif;font-size:15px;font-style:italic;color:var(--muted);border-top:1px solid var(--border);padding-top:16px;margin-top:4px">"${g.affirmation}"</div>
-      <div style="font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:10px">aligned-week.vercel.app · ${type} · Gate ${sunGate}</div>
-    </div>
-
     <div style="text-align:center;margin-top:28px;">
       <button class="btn-secondary" onclick="resetAll()">← Start over</button>
     </div>
