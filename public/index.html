@@ -1039,7 +1039,7 @@ function showPanel2() {
   // Build centers display
   const ALL_CENTERS = ['Head','Ajna','Throat','G Center','Heart/Ego','Sacral','Solar Plexus','Spleen','Root'];
   const centerStr = ALL_CENTERS.map(c => {
-    const isDefined = centers.some(d => { if(d==null) return false; const dl=d.toString().toLowerCase().trim(); const cl=c.toLowerCase().split('/')[0].trim(); return dl===cl||dl.startsWith(cl)||dl.includes(cl); });
+    const isDefined = definedCenterNames.has(c);
     return `<span class="gate-chip ${isDefined ? 'active' : ''}" style="font-size:10px">${c}</span>`;
   }).join('');
 
