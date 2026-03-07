@@ -798,7 +798,7 @@ async function calculateChart() {
 }
 
 function parseHubResponse(data) {
-  if (data.Properties) { const p = data.Properties; return { type: p.Type?.option || "?", authority: p.InnerAuthority?.option || "?", profile: p.Profile?.id || "?", cross: p.IncarnationCross?.option || "", definition: p.Definition?.option || "", strategy: p.Strategy?.option || "", gates: data.Gates || [], channels: data.Channels || [], centers: data.DefinedCenters || [], raw: data }; }
+  if (data.Properties) { const p = data.Properties; return { type: p.Type?.option || "?", authority: p.InnerAuthority?.option || "?", profile: p.Profile?.id || "?", cross: p.IncarnationCross?.option || "", definition: p.Definition?.option || "", strategy: p.Strategy?.option || "", gates: data.Gates || [], channels: data.Channels || [], centers: data.DefinedCenters || [], chartUrl: data.ChartUrl || null, raw: data }; }
   // humandesignhub.app response shape
   // data.type, data.authority, data.profile, data.incarnationCross
   // data.gates = array of {gate, line, planet, type} or just numbers
@@ -1001,6 +1001,7 @@ function showPanel2() {
 
     <div style="margin-bottom:28px">
       <div class="ci-label" style="margin-bottom:12px">Defined Centers</div>
+      ${chartData.chartUrl ? `<div style="margin-bottom:24px;text-align:center"><img src="${chartData.chartUrl}" alt="Your Human Design Chart" style="max-width:100%;width:340px;border-radius:4px;opacity:0.92" /></div>` : ''}
       <div class="centers-grid">${centerHTML}</div>
     </div>
 
