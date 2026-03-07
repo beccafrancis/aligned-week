@@ -1089,6 +1089,7 @@ Return ONLY valid JSON, no markdown:
       body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:4000,messages:[{role:'user',content:prompt}]})
     });
     const d = await r.json();
+    if (!r.ok || !d.content) throw new Error(d.error || 'API error ' + r.status);
     const raw = d.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
     const guide = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
