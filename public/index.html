@@ -744,7 +744,7 @@ async function calculateChart() {
 }
 
 function parseHubResponse(data) {
-  if (data.Properties) { const p = data.Properties; return { type: p.Type?.option || "?", authority: p.InnerAuthority?.option || "?", profile: p.Profile?.id || "?", cross: p.IncarnationCross?.option || "", definition: p.Definition?.option || "", strategy: p.Strategy?.option || "", gates: data.Gates || [], channels: data.Channels || [], centers: (data.DefinedCenters || []).map(c => c.replace(" center","").split(" ").map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(" ")), raw: data }; }
+  if (data.Properties) { const p = data.Properties; return { type: p.Type?.option || "?", authority: p.InnerAuthority?.option || "?", profile: p.Profile?.id || "?", cross: p.IncarnationCross?.option || "", definition: p.Definition?.option || "", strategy: p.Strategy?.option || "", gates: data.Gates || [], channels: data.Channels || [], centers: data.DefinedCenters || [], raw: data }; }
   // humandesignhub.app response shape
   // data.type, data.authority, data.profile, data.incarnationCross
   // data.gates = array of {gate, line, planet, type} or just numbers
@@ -1259,7 +1259,7 @@ function renderResults(g, type, auth, profile, gates, days, todayPos) {
     <div style="text-align:center;margin-top:28px;">
       <button class="btn-secondary" onclick="resetAll()">← Start over</button>
     </div>
-    <p class="footer-note">Birth chart via <a href="https://humandesignhub.app" target="_blank">humandesignhub.app</a> · Transits via <a href="https://ephemeris.fyi" target="_blank">ephemeris.fyi</a></p>
+    <p class="footer-note">Birth chart &amp; transits via <a href="https://bodygraphchart.com" target="_blank">bodygraphchart.com</a></p>
   `;
   document.getElementById('results').classList.add('show');
   window.scrollTo({top:0,behavior:'smooth'});
