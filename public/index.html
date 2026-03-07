@@ -1107,6 +1107,12 @@ Return ONLY valid JSON, no markdown:
 }
 
 function renderResults(g, type, auth, profile, gates, days, todayPos) {
+  window._lastGuide = g;
+  window._lastDays = days;
+  window._lastGuide = g;
+  window._lastDays = days;
+  window._lastGuide = g;
+  window._lastDays = days;
   const profStr = profile ? ` · ${profile}` : '';
   const sunGate = todayPos.sun?.gate;
   const sunName = todayPos.sun?.gname;
@@ -1193,6 +1199,7 @@ function renderResults(g, type, auth, profile, gates, days, todayPos) {
       <div class="aff-label">Gate ${sunGate} · Your Week</div>
     </div>
     <div style="text-align:center;margin-top:28px;">
+      <button class="btn-primary" onclick="addToGoogleCalendar()" style="margin-bottom:12px;width:100%;max-width:320px;display:block;margin-left:auto;margin-right:auto">Add My Week to Google Calendar</button>
       <button class="btn-secondary" onclick="resetAll()">← Start over</button>
     </div>
     <p class="footer-note">Birth chart &amp; transits via <a href="https://bodygraphchart.com" target="_blank">bodygraphchart.com</a></p>
@@ -1223,6 +1230,34 @@ function setStep(n) {
     el.querySelector('.step-num').textContent = i<n ? '✓' : i;
   });
 }
+function addToGoogleCalendar() {
+  const guide = window._lastGuide;
+  const days = window._lastDays;
+  if (!guide || !days) return;
+  days.forEach((d, i) => {
+    const day = guide.days && guide.days[i];
+    if (!day) return;
+    const dateStr = d.dateStr || d.date || '';
+    const parts = dateStr.match(/(\d+)\s+(\w+)/);
+    if (!parts) return;
+    const months = {Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
+    const month = months[parts[2]];
+    if (!month) return;
+    const year = new Date().getFullYear();
+    const dd = String(parts[1]).padStart(2,'0');
+    const mm = String(month).padStart(2,'0');
+    const dateParam = year + mm + dd;
+    const title = encodeURIComponent('HD: ' + (day.focus || '').substring(0, 50));
+    const details = encodeURIComponent('FOCUS: ' + (day.focus || '') + '
+
+AVOID: ' + (day.avoid || '') + '
+
+BEST WINDOW: ' + (day.window || ''));
+    const url = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + title + '&dates=' + dateParam + '/' + dateParam + '&details=' + details;
+    setTimeout(() => window.open(url, '_blank'), i * 300);
+  });
+}
+
 function resetAll() {
   document.getElementById('results').classList.remove('show');
   document.getElementById('results').innerHTML = '';
