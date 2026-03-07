@@ -1080,7 +1080,7 @@ Background field: Mercury Gate ${todayPos.mercury?.gate||'?'}, Venus Gate ${toda
 Instructions: Reference SPECIFIC gate names. Explain WHY each transit matters for this type/authority. Flag channel completions as especially potent. Moon gate changes every ~10hr — treat moon hits as peak activation windows. Be concrete, not generic.
 
 Return ONLY valid JSON, no markdown:
-{"weekTheme":"5-7 word theme using actual gate names","sunNote":"2 sentences: Sun Gate ${todayPos.sun?.gate} ${todayPos.sun?.gname} and what it means for ${type}s","moonNote":"2 sentences about Moon's journey this week and the most powerful moon moment for this person","strategy":"2 sentences: concrete strategy for ${type} with ${auth} Authority this week","days":[${days.map(d=>`{"day":"${d.dayName}","date":"${d.dateStr}","sunGate":${d.pos.sun?.gate},"moonGate":${d.pos.moon?.gate},"sunHit":${!!d.sunHit},"moonHit":${!!d.moonHit},"guidance":"2 sentences. Be specific to Gate ${d.pos.sun?.gate} ${d.pos.sun?.gname} and their type. ${d.sunHit?'Their Sun gate is activated — make this feel significant.':''}${d.moonHit?'Their Moon gate is activated — call out this window.':''}${d.sunCh?`${d.sunCh} channel is completed by transit.`:''}"}`).join(',')}],"bestDays":"1-2 days with exact reason based on gate themes and type","backgroundField":"1 sentence on Mercury/Venus/Mars/Jupiter/Saturn backdrop","notSelf":"1 sentence: specific not-self watch for ${type} given dominant gates this week","affirmation":"12-16 word affirmation rooted in Sun Gate ${todayPos.sun?.gate} and their design"}`;
+{"focusSentence":"1 plain-English sentence: what should this person focus on this week? No jargon.","energyTheme":"3-5 words describing the energy pattern","bestAction":"1 sentence: the single best action this week","trapToAvoid":"1 sentence: the main trap to avoid","weekTheme":"5-7 word theme using actual gate names","sunNote":"2 sentences: Sun Gate ${todayPos.sun?.gate} ${todayPos.sun?.gname} and what it means for ${type}s","moonNote":"2 sentences about Moon's journey this week and the most powerful moon moment for this person","strategy":"2 sentences: concrete strategy for ${type} with ${auth} Authority this week","days":[${days.map(d=>`{"day":"${d.dayName}","date":"${d.dateStr}","sunGate":${d.pos.sun?.gate},"moonGate":${d.pos.moon?.gate},"sunHit":${!!d.sunHit},"moonHit":${!!d.moonHit},"guidance":"2 sentences. Be specific to Gate ${d.pos.sun?.gate} ${d.pos.sun?.gname} and their type. ${d.sunHit?'Their Sun gate is activated — make this feel significant.':''}${d.moonHit?'Their Moon gate is activated — call out this window.':''}${d.sunCh?`${d.sunCh} channel is completed by transit.`:''}"}`).join(',')}],"bestDays":"1-2 days with exact reason based on gate themes and type","backgroundField":"1 sentence on Mercury/Venus/Mars/Jupiter/Saturn backdrop","notSelf":"1 sentence: specific not-self watch for ${type} given dominant gates this week","affirmation":"12-16 word affirmation rooted in Sun Gate ${todayPos.sun?.gate} and their design"}`;
 
   try {
     const r = await fetch('/api/guide',{
@@ -1133,9 +1133,27 @@ function renderResults(g, type, auth, profile, gates, days, todayPos) {
 
   document.getElementById('results').innerHTML = `
     <div class="res-header">
-      <div class="res-theme">${g.weekTheme}</div>
+      <div style="font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:10px">Your Focus This Week</div>
+      <div style="font-family:'Fraunces',serif;font-size:clamp(22px,4vw,36px);font-weight:300;line-height:1.25;color:var(--text);margin-bottom:14px">${g.focusSentence}</div>
+      <div class="res-theme" style="font-size:clamp(16px,2.5vw,24px);color:var(--muted)">${g.weekTheme}</div>
       <div class="res-meta">${type}${profStr} · ${auth} Authority · ☀ Gate ${sunGate}: ${sunName}</div>
     </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px">
+      <div style="border:1px solid var(--border-accent);padding:20px;background:var(--accent-light)">
+        <div style="font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:8px">Energy Theme</div>
+        <div style="font-family:'Fraunces',serif;font-size:17px;font-weight:300;color:var(--text)">${g.energyTheme}</div>
+      </div>
+      <div style="border:1px solid var(--border);padding:20px;background:var(--surface)">
+        <div style="font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:8px">Best Action</div>
+        <div style="font-size:14px;font-weight:300;color:var(--text);line-height:1.5">${g.bestAction}</div>
+      </div>
+      <div style="border:1px solid var(--border);padding:20px;background:var(--surface)">
+        <div style="font-size:9px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:#C0402A;margin-bottom:8px">Watch Out For</div>
+        <div style="font-size:14px;font-weight:300;color:var(--text);line-height:1.5">${g.trapToAvoid}</div>
+      </div>
+    </div>
+
     <div class="highlight">
       <span class="hl-label">☀ Sun in Gate ${sunGate} · ${sunName}</span>
       ${g.sunNote}
