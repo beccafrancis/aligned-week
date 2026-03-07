@@ -614,8 +614,10 @@ async function fetchWeekTransits() {
           const pos = {};
           const planets = {sun:'Sun',moon:'Moon',mercury:'Mercury',venus:'Venus',mars:'Mars',jupiter:'Jupiter',saturn:'Saturn'};
           for (const [key, name] of Object.entries(planets)) {
+            const gate = data.Personality?.[name]?.Gate ?? 0;
+            const line = data.Personality?.[name]?.Line ?? 0;
             const deg = data.Planets?.[name]?.abs_pos ?? 0;
-            pos[key] = { gate: degToGate(deg), line: degToLine(deg), deg: parseFloat(deg.toFixed(2)), gname: GATE_NAMES[degToGate(deg)] };
+            pos[key] = { gate, line, deg: parseFloat(deg.toFixed(2)), gname: GATE_NAMES[gate] };
           }
           return { date:d, dayName: dayNames[d.getDay()], dateStr: d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}), pos };
         });
