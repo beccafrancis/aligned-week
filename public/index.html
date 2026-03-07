@@ -861,6 +861,142 @@ function normaliseProfile(raw) {
   return raw.toString();
 }
 
+
+function buildBodygraphSVG(gates, channels, centers) {
+  // Centre definitions: name, cx, cy, shape, size
+  const CENTERS = {
+    'Head':        { cx:200, cy:42,  shape:'triangle-down', w:80, h:50, label:'HEAD' },
+    'Ajna':        { cx:200, cy:118, shape:'triangle-up',   w:80, h:50, label:'AJNA' },
+    'Throat':      { cx:200, cy:208, shape:'rect',          w:72, h:36, label:'THROAT' },
+    'G':           { cx:200, cy:298, shape:'diamond',       w:68, h:68, label:'G' },
+    'Heart':       { cx:282, cy:268, shape:'triangle-up',   w:60, h:46, label:'HEART' },
+    'Sacral':      { cx:200, cy:390, shape:'rect',          w:88, h:44, label:'SACRAL' },
+    'SolarPlexus': { cx:294, cy:358, shape:'triangle-up',   w:66, h:50, label:'SOLAR\nPLEXUS' },
+    'Spleen':      { cx:108, cy:268, shape:'triangle-up',   w:66, h:50, label:'SPLEEN' },
+    'Root':        { cx:200, cy:466, shape:'rect',          w:72, h:36, label:'ROOT' },
+  };
+
+  // Map API center names to our keys
+  const CENTER_MAP = {
+    'head':'Head','ajna':'Ajna','throat':'Throat',
+    'g center':'G','g':'G',
+    'heart/ego':'Heart','heart':'Heart','ego':'Heart','will':'Heart',
+    'sacral':'Sacral',
+    'solar plexus':'SolarPlexus','emotional':'SolarPlexus',
+    'spleen':'Spleen','splenic':'Spleen',
+    'root':'Root'
+  };
+
+  const definedKeys = new Set();
+  centers.forEach(c => {
+    const k = CENTER_MAP[c.toLowerCase().trim()];
+    if (k) definedKeys.add(k);
+  });
+
+  // Channel gate pairs → which centers they connect
+  const CHANNEL_CENTERS = {
+    '64-47':['Head','Ajna'],'61-24':['Head','Ajna'],'63-4':['Head','Ajna'],
+    '17-62':['Ajna','Throat'],'43-23':['Ajna','Throat'],'11-56':['Ajna','Throat'],
+    '16-48':['Throat','Spleen'],'20-57':['Throat','Spleen'],
+    '31-7':['Throat','G'],'8-1':['Throat','G'],'33-13':['Throat','G'],
+    '45-21':['Throat','Heart'],'35-36':['Throat','SolarPlexus'],
+    '12-22':['Throat','SolarPlexus'],
+    '20-34':['Throat','Sacral'],'20-10':['Throat','G'],
+    '2-14':['G','Sacral'],'46-29':['G','Sacral'],'15-5':['G','Sacral'],
+    '25-51':['G','Heart'],'10-20':['G','Throat'],
+    '10-34':['G','Sacral'],'57-34':['Spleen','Sacral'],
+    '26-44':['Heart','Spleen'],'21-45':['Heart','Throat'],
+    '37-40':['Heart','Spleen'],
+    '6-59':['SolarPlexus','Sacral'],'27-50':['Sacral','Spleen'],
+    '34-57':['Sacral','Spleen'],'9-52':['Sacral','Root'],
+    '3-60':['Sacral','Root'],'42-53':['Sacral','Root'],
+    '19-49':['Root','SolarPlexus'],'39-55':['Root','SolarPlexus'],
+    '41-30':['Root','SolarPlexus'],'28-38':['Root','Spleen'],
+    '32-54':['Root','Spleen'],'18-58':['Root','Spleen'],
+    '29-46':['Sacral','G'],'34-10':['Sacral','G'],
+    '57-20':['Spleen','Throat'],'10-57':['G','Spleen'],
+  };
+
+  // Determine which channels are defined
+  const definedChannels = new Set();
+  channels.forEach(ch => {
+    const id = typeof ch === 'string' ? ch : (ch.channel || ch.id || '');
+    const norm = id.split('-').map(Number).sort((a,b)=>a-b).join('-');
+    // try both orderings
+    Object.keys(CHANNEL_CENTERS).forEach(k => {
+      const kn = k.split('-').map(Number).sort((a,b)=>a-b).join('-');
+      if (kn === norm) definedChannels.add(k);
+    });
+  });
+
+  const W = 400, H = 520;
+  const accentColor = '#4A6741';
+  const definedFill = '#4A6741';
+  const openFill = '#F5F5F2';
+  const openStroke = '#C8D4C0';
+  const definedStroke = '#3A5731';
+  const channelColor = '#4A6741';
+  const openChannelColor = '#E0DDD8';
+
+  function centerShape(key, def) {
+    const c = CENTERS[key];
+    const fill = def ? definedFill : openFill;
+    const stroke = def ? definedStroke : openStroke;
+    const textCol = def ? '#ffffff' : '#8A8A82';
+    const lines = c.label.split('\n');
+
+    if (c.shape === 'rect') {
+      const rx = 6;
+      const x = c.cx - c.w/2, y = c.cy - c.h/2;
+      const fontSize = key === 'Sacral' ? 9 : 8;
+      return `<rect x="${x}" y="${y}" width="${c.w}" height="${c.h}" rx="${rx}" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>
+        ${lines.map((l,i) => `<text x="${c.cx}" y="${c.cy + (lines.length>1?(i-0.5)*11:4)}" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="${fontSize}" font-weight="500" letter-spacing="0.08em" fill="${textCol}">${l}</text>`).join('')}`;
+    }
+    if (c.shape === 'diamond') {
+      const hw = c.w/2, hh = c.h/2;
+      return `<polygon points="${c.cx},${c.cy-hh} ${c.cx+hw},${c.cy} ${c.cx},${c.cy+hh} ${c.cx-hw},${c.cy}" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>
+        <text x="${c.cx}" y="${c.cy+4}" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" font-weight="500" letter-spacing="0.08em" fill="${textCol}">${c.label}</text>`;
+    }
+    if (c.shape === 'triangle-down') {
+      const hw = c.w/2, y1 = c.cy - c.h/2, y2 = c.cy + c.h/2;
+      return `<polygon points="${c.cx-hw},${y1} ${c.cx+hw},${y1} ${c.cx},${y2}" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>
+        <text x="${c.cx}" y="${c.cy-2}" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" font-weight="500" letter-spacing="0.08em" fill="${textCol}">${c.label}</text>`;
+    }
+    if (c.shape === 'triangle-up') {
+      const hw = c.w/2, y1 = c.cy + c.h/2, y2 = c.cy - c.h/2;
+      return `<polygon points="${c.cx-hw},${y1} ${c.cx+hw},${y1} ${c.cx},${y2}" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>
+        ${lines.map((l,i) => `<text x="${c.cx}" y="${c.cy + (lines.length>1?(i-0.3)*10:5)}" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="7.5" font-weight="500" letter-spacing="0.06em" fill="${textCol}">${l}</text>`).join('')}`;
+    }
+    return '';
+  }
+
+  // Draw channel lines between center midpoints
+  function channelLine(key, def) {
+    const pair = CHANNEL_CENTERS[key];
+    if (!pair) return '';
+    const c1 = CENTERS[pair[0]], c2 = CENTERS[pair[1]];
+    if (!c1 || !c2) return '';
+    const color = def ? channelColor : openChannelColor;
+    const sw = def ? 3 : 1.5;
+    return `<line x1="${c1.cx}" y1="${c1.cy}" x2="${c2.cx}" y2="${c2.cy}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" opacity="${def?1:0.5}"/>`;
+  }
+
+  // Build all channel lines (open first, then defined on top)
+  const allChannelKeys = Object.keys(CHANNEL_CENTERS);
+  const openLines = allChannelKeys.filter(k => !definedChannels.has(k)).map(k => channelLine(k, false)).join('');
+  const definedLines = allChannelKeys.filter(k => definedChannels.has(k)).map(k => channelLine(k, true)).join('');
+
+  // Build center shapes
+  const centerShapes = Object.keys(CENTERS).map(k => centerShape(k, definedKeys.has(k))).join('');
+
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:340px;display:block;" xmlns="http://www.w3.org/2000/svg">
+    <rect width="${W}" height="${H}" fill="transparent"/>
+    ${openLines}
+    ${definedLines}
+    ${centerShapes}
+  </svg>`;
+}
+
 function showPanel2() {
   document.getElementById('panel1').classList.remove('show');
   setStep(2);
@@ -887,52 +1023,37 @@ function showPanel2() {
   }).join('');
 
   document.getElementById('chartResult').innerHTML = `
-    <div class="chart-grid">
-      <div class="chart-item">
-        <div class="ci-label">Type</div>
-        <div class="ci-value big">${chartData.type}</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:24px;">
+
+      ${buildBodygraphSVG(gates, channels, centers)}
+
+      <div class="chart-grid" style="width:100%">
+        <div class="chart-item">
+          <div class="ci-label">Type</div>
+          <div class="ci-value big">${chartData.type}</div>
+        </div>
+        <div class="chart-item">
+          <div class="ci-label">Authority</div>
+          <div class="ci-value">${chartData.authority}</div>
+        </div>
+        <div class="chart-item">
+          <div class="ci-label">Profile</div>
+          <div class="ci-value">${chartData.profile}</div>
+        </div>
+        ${chartData.cross ? `<div class="chart-item" style="grid-column:1/-1">
+          <div class="ci-label">Incarnation Cross</div>
+          <div class="ci-value">${chartData.cross}</div>
+        </div>` : ''}
+        ${chartData.strategy ? `<div class="chart-item" style="grid-column:1/-1">
+          <div class="ci-label">Strategy</div>
+          <div class="ci-value" style="font-style:italic;color:var(--gold)">${chartData.strategy}</div>
+        </div>` : ''}
+        ${chartData.definition ? `<div class="chart-item" style="grid-column:1/-1">
+          <div class="ci-label">Definition</div>
+          <div class="ci-value">${chartData.definition}</div>
+        </div>` : ''}
       </div>
-      <div class="chart-item">
-        <div class="ci-label">Authority</div>
-        <div class="ci-value">${chartData.authority}</div>
-      </div>
-      <div class="chart-item">
-        <div class="ci-label">Profile</div>
-        <div class="ci-value">${chartData.profile}</div>
-      </div>
-      ${chartData.cross ? `<div class="chart-item" style="grid-column:1/-1">
-        <div class="ci-label">Incarnation Cross</div>
-        <div class="ci-value">${chartData.cross}</div>
-      </div>` : ''}
-      ${chartData.strategy ? `<div class="chart-item" style="grid-column:1/-1">
-        <div class="ci-label">Strategy</div>
-        <div class="ci-value" style="font-style:italic;color:var(--gold)">${chartData.strategy}</div>
-      </div>` : ''}
-      ${chartData.definition ? `<div class="chart-item" style="grid-column:1/-1">
-        <div class="ci-label">Definition</div>
-        <div class="ci-value">${chartData.definition}</div>
-      </div>` : ''}
     </div>
-
-    <div style="margin-top:20px;">
-      <div class="ci-label" style="margin-bottom:10px">Defined Centers (${centers.length})</div>
-      <div>${centerStr}</div>
-    </div>
-
-    <div style="margin-top:20px;">
-      <div class="ci-label" style="margin-bottom:10px">Defined Gates (${gates.length})</div>
-      <div>${allNums.map(n => `<span class="gate-chip ${gates.includes(n)?'active':''}" title="${GATE_NAMES[n]||''}">${n}</span>`).join('')}</div>
-    </div>
-
-    <div style="margin-top:20px;">
-      <div class="ci-label" style="margin-bottom:10px">Defined Channels (${channels.length})</div>
-      <div>${channelStr}</div>
-    </div>
-
-    <details style="margin-top:20px;">
-      <summary style="font-family:'Syne',sans-serif;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);cursor:pointer;">Raw API response</summary>
-      <pre style="font-size:10px;color:var(--muted);margin-top:10px;overflow:auto;max-height:200px;padding:12px;background:var(--card);border:1px solid var(--border)">${JSON.stringify(chartData.raw, null, 2)}</pre>
-    </details>
   `;
 
   document.getElementById('panel2').classList.add('show');
