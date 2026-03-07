@@ -607,14 +607,15 @@ async function fetchWeekTransits() {
     Array.from({length:7}, (_,i) => {
       const d = new Date(today);
       d.setDate(today.getDate() + i);
-      const iso = d.toISOString().split('.')[0]+'Z';
-      return fetch(`https://ephemeris.fyi/ephemeris/get_ephemeris_data?bodies=${bodies}&latitude=0&longitude=0&datetime=${iso}`)
+      const dateStr = d.toISOString().slice(0,10) + ' 12:00';
+      return fetch(`/api/transits?date=${encodeURIComponent(dateStr)}`)
         .then(r => r.json())
         .then(data => {
           const pos = {};
-          for (const [name, info] of Object.entries(data.bodies || data)) {
-            const deg = info.longitude ?? info.position?.longitude ?? 0;
-            pos[name.toLowerCase()] = { gate: degToGate(deg), line: degToLine(deg), deg: parseFloat(deg.toFixed(2)), gname: GATE_NAMES[degToGate(deg)] };
+          const planets = {sun:'Sun',moon:'Moon',mercury:'Mercury',venus:'Venus',mars:'Mars',jupiter:'Jupiter',saturn:'Saturn'};
+          for (const [key, name] of Object.entries(planets)) {
+            const deg = data.Planets?.[name]?.abs_pos ?? 0;
+            pos[key] = { gate: degToGate(deg), line: degToLine(deg), deg: parseFloat(deg.toFixed(2)), gname: GATE_NAMES[degToGate(deg)] };
           }
           return { date:d, dayName: dayNames[d.getDay()], dateStr: d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}), pos };
         });
