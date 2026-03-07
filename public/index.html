@@ -1039,7 +1039,7 @@ function showPanel2() {
   // Build centers display
   const ALL_CENTERS = ['Head','Ajna','Throat','G Center','Heart/Ego','Sacral','Solar Plexus','Spleen','Root'];
   const centerStr = ALL_CENTERS.map(c => {
-    const isDefined = centers.some(d => d && d.toString().toLowerCase().includes(c.toLowerCase().split('/')[0].trim()));
+    const isDefined = centers.some(d => { if(d==null) return false; const dl=d.toString().toLowerCase().trim(); const cl=c.toLowerCase().split('/')[0].trim(); return dl===cl||dl.startsWith(cl)||dl.includes(cl); });
     return `<span class="gate-chip ${isDefined ? 'active' : ''}" style="font-size:10px">${c}</span>`;
   }).join('');
 
@@ -1077,7 +1077,7 @@ function showPanel2() {
 
     <div style="margin-top:20px"><div class="ci-label" style="margin-bottom:10px">Energy Centers</div><div>${centerStr}</div></div>
 
-    <div style="margin-top:20px"><div class="ci-label" style="margin-bottom:10px">Defined Gates (${gates.length})</div><div>${allNums.map(n => "<span class=gate-chip "+( gates.includes(n)?"active":"")+">"+n+"</span>").join("")}</div></div>
+    <div style="margin-top:20px"><div class="ci-label" style="margin-bottom:10px">Defined Gates (${gates.length})</div><div>${allNums.map(n => "<span class="gate-chip "+( gates.includes(n)?"active"":""")+">"+n+"</span>").join("")}</div></div>
 
     <div style="margin-top:20px"><div class="ci-label" style="margin-bottom:10px">Defined Channels (${channels.length})</div><div>${channelStr}</div></div>
     </div>
