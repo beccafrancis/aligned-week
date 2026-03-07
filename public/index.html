@@ -1248,11 +1248,7 @@ function addToGoogleCalendar() {
     const mm = String(month).padStart(2,'0');
     const dateParam = year + mm + dd;
     const title = encodeURIComponent('HD: ' + (day.focus || '').substring(0, 50));
-    const details = encodeURIComponent('FOCUS: ' + (day.focus || '') + '
-
-AVOID: ' + (day.avoid || '') + '
-
-BEST WINDOW: ' + (day.window || ''));
+    const details = encodeURIComponent('FOCUS: ' + (day.focus || '') + ' | AVOID: ' + (day.avoid || '') + ' | BEST WINDOW: ' + (day.window || ''));
     const url = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + title + '&dates=' + dateParam + '/' + dateParam + '&details=' + details;
     setTimeout(() => window.open(url, '_blank'), i * 300);
   });
