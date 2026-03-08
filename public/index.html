@@ -109,15 +109,28 @@ h1 em { font-style: italic; color: var(--accent); }
 .pcell.hit-sun { background: var(--accent-light); }
 .pcell.hit-moon { background: var(--moon-light); }
 .p-label {
-  font-size: 8px;
-  font-weight: 500;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  margin-bottom: 6px;
+  font-size: 16px;
+  font-weight: 400;
+  margin-bottom: 4px;
   color: var(--muted);
+  line-height: 1;
 }
-.p-label.sun  { color: var(--accent); }
-.p-label.moon { color: var(--moon); }
+.p-label-text {
+  display: block;
+  font-size: 7px;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.p-label.sun  { color: #C17F2A; }
+.p-label.moon { color: #7a6ea0; }
+.p-label.merc { color: #5a8a7a; }
+.p-label.venus { color: #a06070; }
+.p-label.mars { color: #C0402A; }
+.p-label.jup { color: #4A6B3A; }
+.p-label.sat { color: #6a7a8a; }
 .p-gate { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 300; color: var(--text); line-height: 1; }
 .p-name { font-size: 9px; color: var(--muted); margin-top: 3px; line-height: 1.3; }
 .p-hit-tag { font-size: 8px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-top: 4px; }
@@ -710,20 +723,20 @@ async function init() {
 
 function renderStrip(pos, uGates) {
   const planets = [
-    {k:'sun',lbl:'☀ Sun',cls:'sun'},
-    {k:'moon',lbl:'☽ Moon',cls:'moon'},
-    {k:'mercury',lbl:'☿ Mercury',cls:'merc'},
-    {k:'venus',lbl:'♀ Venus',cls:'venus'},
-    {k:'mars',lbl:'♂ Mars',cls:'mars'},
-    {k:'jupiter',lbl:'♃ Jupiter',cls:'jup'},
-    {k:'saturn',lbl:'♄ Saturn',cls:'sat'},
+    {k:'sun',lbl:'☀',txt:'Sun',cls:'sun'},
+    {k:'moon',lbl:'☽',txt:'Moon',cls:'moon'},
+    {k:'mercury',lbl:'☿',txt:'Mercury',cls:'merc'},
+    {k:'venus',lbl:'♀',txt:'Venus',cls:'venus'},
+    {k:'mars',lbl:'♂',txt:'Mars',cls:'mars'},
+    {k:'jupiter',lbl:'♃',txt:'Jupiter',cls:'jup'},
+    {k:'saturn',lbl:'♄',txt:'Saturn',cls:'sat'},
   ];
   document.getElementById('pStrip').innerHTML = planets.map(p => {
     const d = pos[p.k];
     const hit = d && uGates.includes(d.gate);
     const hitCls = hit ? (p.k==='moon' ? 'hit-moon' : 'hit-sun') : '';
     return `<div class="pcell ${hitCls}">
-      <div class="p-label ${p.cls}">${p.lbl}</div>
+      <div class="p-label ${p.cls}">${p.lbl}</div><span class="p-label-text">${p.txt}</span><span class="p-label-text">${p.txt}</span><span class="p-label-text">${p.txt}</span>
       <div class="p-gate">${d?.gate ?? '—'}</div>
       <div class="p-name">${d?.gname ?? ''}</div>
       ${hit ? '<div class="p-hit-tag">Your gate</div>' : ''}
@@ -1184,9 +1197,22 @@ function renderResults(g, type, auth, profile, gates, days, todayPos) {
       <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px">
         ${(g.days||[]).map(d => {
           const isHit = d.sunHit || d.moonHit;
-          return `<div style="text-align:center;padding:12px 4px;border:1px solid ${isHit?'var(--border-accent)':'var(--border)'};background:${isHit?'var(--accent-light)':'var(--surface)'}">
-            <div style="font-size:9px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">${(d.day||'').substring(0,3)}</div>
-            <div style="font-size:11px;font-weight:400;color:${isHit?'var(--accent)':'var(--text)'};line-height:1.3">${d.energyWord||''}</div>
+          const w = (d.energyWord||'').toLowerCase();
+          const isRest = /rest|slow|quiet|protect|pause|reflect|hold|wait|still/.test(w);
+          const isAction = /send|launch|make|say|move|act|speak|push|ship|call|go/.test(w);
+          const isMoon = d.moonHit;
+          const isSun = d.sunHit && !d.moonHit;
+          let bg, border, dotColor, icon;
+          if (isRest) { bg='rgba(180,170,155,0.12)'; border='var(--border)'; dotColor='var(--muted)'; icon='☽'; }
+          else if (isAction && isHit) { bg='rgba(74,107,58,0.12)'; border='var(--border-accent)'; dotColor='var(--accent)'; icon='⚡'; }
+          else if (isAction) { bg='rgba(74,107,58,0.07)'; border='var(--border-accent)'; dotColor='var(--accent)'; icon='↑'; }
+          else if (isMoon) { bg='rgba(120,110,160,0.08)'; border='1px solid rgba(120,110,160,0.3)'; dotColor='#7a6ea0'; icon='☽'; }
+          else if (isSun) { bg='var(--accent-light)'; border='var(--border-accent)'; dotColor='var(--accent)'; icon='☀'; }
+          else { bg='var(--surface)'; border='var(--border)'; dotColor='var(--muted)'; icon='·'; }
+          return `<div style="text-align:center;padding:12px 4px 10px;border:1px solid ${border};background:${bg};position:relative">
+            <div style="font-size:14px;margin-bottom:4px;opacity:0.7">${icon}</div>
+            <div style="font-size:9px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px">${(d.day||'').substring(0,3)}</div>
+            <div style="font-size:10px;font-weight:400;color:${dotColor};line-height:1.35">${d.energyWord||''}</div>
           </div>`;
         }).join('')}
       </div>
