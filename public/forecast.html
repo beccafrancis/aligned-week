@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your 12-Week Forecast · Aligned Week</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Fraunces:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FAFAF8;
+  --surface: #FFFFFF;
+  --card: #F5F5F2;
+  --border: #E8E8E4;
+  --border-accent: #C8D4C0;
+  --text: #1A1A18;
+  --muted: #8A8A82;
+  --accent: #4A6741;
+  --accent-light: rgba(74,103,65,0.08);
+  --accent-mid: rgba(74,103,65,0.15);
+  --moon: #6B8FAB;
+  --moon-light: rgba(107,143,171,0.08);
+  --err: #C0402A;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; font-size:16px; font-weight:300; min-height:100vh; }
+.wrap { max-width:860px; margin:0 auto; padding:0 32px 120px; }
+
+/* Header */
+.site-header { padding:32px 0 24px; border-bottom:1px solid var(--border); margin-bottom:48px; display:flex; justify-content:space-between; align-items:flex-end; }
+.site-title { font-family:'Fraunces',serif; font-size:28px; font-weight:300; }
+.site-title em { font-style:italic; color:var(--accent); }
+.back-link { font-size:12px; color:var(--muted); text-decoration:none; letter-spacing:.08em; }
+.back-link:hover { color:var(--accent); }
+
+/* Form */
+.form-section { margin-bottom:48px; }
+.form-intro { margin-bottom:32px; }
+.form-intro h1 { font-family:'Fraunces',serif; font-size:clamp(24px,4vw,38px); font-weight:300; line-height:1.2; margin-bottom:12px; }
+.form-intro p { font-size:15px; color:var(--muted); line-height:1.6; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
+.form-group { display:flex; flex-direction:column; gap:6px; }
+.form-group.full { grid-column:1/-1; }
+label { font-size:11px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+input { background:var(--surface); border:1px solid var(--border); padding:12px 14px; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:300; color:var(--text); outline:none; transition:border-color .2s; width:100%; }
+input:focus { border-color:var(--accent); }
+.btn-primary { background:var(--accent); color:#fff; border:none; padding:16px 32px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; letter-spacing:.06em; cursor:pointer; transition:background .2s,transform .1s; width:100%; }
+.btn-primary:hover { background:#3A5432; }
+.btn-primary:disabled { opacity:.4; cursor:not-allowed; }
+.btn-secondary { background:transparent; border:1px solid var(--border); color:var(--muted); padding:12px 24px; font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; transition:all .2s; }
+.btn-secondary:hover { border-color:var(--accent); color:var(--accent); }
+.err-msg { font-size:13px; color:var(--err); margin-top:8px; display:none; }
+.err-msg.show { display:block; }
+
+/* Loading */
+.loading { display:none; text-align:center; padding:80px 0; }
+.loading.show { display:block; }
+.loading-title { font-family:'Fraunces',serif; font-size:22px; font-weight:300; margin-bottom:8px; }
+.loading-sub { font-size:13px; color:var(--muted); margin-bottom:32px; }
+.loading-bar { width:200px; height:2px; background:var(--border); margin:0 auto 8px; position:relative; overflow:hidden; }
+.loading-bar::after { content:''; position:absolute; left:-50%; width:50%; height:100%; background:var(--accent); animation:slide 1.2s ease-in-out infinite; }
+@keyframes slide { 0%{left:-50%} 100%{left:150%} }
+.loading-week { font-size:12px; color:var(--muted); letter-spacing:.08em; }
+
+/* Results */
+.results { display:none; }
+.results.show { display:block; }
+.results-header { margin-bottom:40px; padding-bottom:32px; border-bottom:1px solid var(--border); }
+.results-header .label { font-size:11px; font-weight:500; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); margin-bottom:12px; }
+.results-header h2 { font-family:'Fraunces',serif; font-size:clamp(22px,3.5vw,34px); font-weight:300; line-height:1.25; margin-bottom:10px; }
+.results-header .meta { font-size:13px; color:var(--muted); }
+
+/* Week cards */
+.week-card { border:1px solid var(--border); margin-bottom:16px; background:var(--surface); }
+.week-card.peak { border-color:var(--border-accent); background:var(--accent-light); }
+.week-card.rest { background:rgba(180,170,155,0.06); }
+.week-header { display:flex; justify-content:space-between; align-items:center; padding:20px 24px; cursor:pointer; border-bottom:1px solid var(--border); user-select:none; }
+.week-card.peak .week-header { border-bottom-color:var(--border-accent); }
+.week-left { display:flex; align-items:center; gap:16px; }
+.week-icon { font-size:18px; width:28px; text-align:center; }
+.week-num { font-size:10px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+.week-dates { font-size:13px; color:var(--muted); margin-top:2px; }
+.week-theme { font-family:'Fraunces',serif; font-size:17px; font-weight:300; color:var(--text); }
+.week-card.peak .week-theme { color:var(--accent); }
+.week-chevron { font-size:12px; color:var(--muted); transition:transform .2s; }
+.week-chevron.open { transform:rotate(180deg); }
+.week-body { display:none; padding:24px; }
+.week-body.open { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.week-field { }
+.week-field-label { font-size:9px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+.week-field-label.green { color:var(--accent); }
+.week-field-label.red { color:var(--err); }
+.week-field-text { font-size:13px; font-weight:300; color:var(--text); line-height:1.6; }
+.week-gates { grid-column:1/-1; display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
+.gate-tag { font-size:10px; padding:3px 8px; border:1px solid var(--border); color:var(--muted); }
+.gate-tag.hit { border-color:var(--border-accent); color:var(--accent); background:var(--accent-light); }
+
+/* Quarter overview */
+.quarter-overview { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:32px; }
+.quarter-card { border:1px solid var(--border); padding:20px; background:var(--surface); }
+.quarter-card-label { font-size:9px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
+.quarter-card-text { font-size:13px; font-weight:300; color:var(--text); line-height:1.5; }
+
+/* Download */
+.download-section { margin-top:40px; text-align:center; }
+.download-note { font-size:12px; color:var(--muted); margin-top:12px; }
+
+/* Footer */
+.footer-note { font-size:11px; color:var(--muted); text-align:center; margin-top:48px; }
+.footer-note a { color:var(--muted); }
+
+@media(max-width:600px) {
+  .form-grid { grid-template-columns:1fr; }
+  .quarter-overview { grid-template-columns:1fr; }
+  .week-body.open { grid-template-columns:1fr; }
+  .week-theme { font-size:15px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="site-header">
+    <div class="site-title">Your <em>Aligned</em> Quarter</div>
+    <a href="/" class="back-link">← Back to this week</a>
+  </header>
+
+  <!-- Form -->
+  <div class="form-section" id="formSection">
+    <div class="form-intro">
+      <h1>Your next 12 weeks,<br>mapped to your design.</h1>
+      <p>Enter your birth details to generate a personalised 12-week Human Design forecast — week by week, based on your chart and live planetary transits.</p>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Date of Birth</label>
+        <input type="date" id="dob" />
+      </div>
+      <div class="form-group">
+        <label>Time of Birth</label>
+        <input type="time" id="tob" />
+      </div>
+      <div class="form-group full">
+        <label>City of Birth</label>
+        <input type="text" id="city" placeholder="e.g. Sydney, Australia" />
+      </div>
+    </div>
+    <div class="err-msg" id="err1"></div>
+    <button class="btn-primary" id="generateBtn" onclick="generateForecast()">Generate my 12-week forecast →</button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="loading-title">Building your forecast…</div>
+    <div class="loading-sub" id="loadingSub">Calculating your birth chart</div>
+    <div class="loading-bar"></div>
+    <div class="loading-week" id="loadingWeek"></div>
+  </div>
+
+  <!-- Results -->
+  <div class="results" id="results"></div>
+</div>
+
+<script>
+// ── Pre-fill from localStorage ──
+(function() {
+  try {
+    const dob = localStorage.getItem('aw_dob');
+    const tob = localStorage.getItem('aw_tob');
+    const city = localStorage.getItem('aw_city');
+    if (dob) document.getElementById('dob').value = dob;
+    if (tob) document.getElementById('tob').value = tob;
+    if (city) document.getElementById('city').value = city;
+  } catch(e) {}
+})();
+
+// ── Gate names (abbreviated) ──
+const GATE_NAMES = {1:'Self-Expression',2:'Receptive',3:'Ordering',4:'Formulization',5:'Fixed Patterns',6:'Friction',7:'The Role of the Self',8:'Contribution',9:'Focus',10:'Behavior of Self',11:'Ideas',12:'Caution',13:'The Listener',14:'Power Skills',15:'Extremes',16:'Skills',17:'Opinion',18:'Correction',19:'Wanting',20:'Now',21:'Biting Through',22:'Openness',23:'Assimilation',24:'Rationalization',25:'Innocence',26:'Egoist',27:'Caring',28:'The Game Player',29:'Saying Yes',30:'Desires',31:'Influence',32:'Continuity',33:'Privacy',34:'Power',35:'Change',36:'Crisis',37:'Friendship',38:'Opposition',39:'Provocation',40:'Aloneness',41:'Contraction',42:'Growth',43:'Insight',44:'Alertness',45:'Gatherer',46:'Determination',47:'Realization',48:'Depth',49:'Revolution',50:'Values',51:'Shock',52:'Stillness',53:'Beginnings',54:'Ambition',55:'Spirit',56:'Stimulation',57:'Intuition',58:'Joy',59:'Sexuality',60:'Limitation',61:'Mystery',62:'Detail',63:'Doubt',64:'Confusion'};
+
+function degToGate(deg) {
+  const d = ((deg % 360) + 360) % 360;
+  return Math.floor(d / 5.625) % 64 + 1;
+}
+
+function addDays(date, n) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + n);
+  return d;
+}
+
+function formatDate(d) {
+  return d.toLocaleDateString('en-GB', {day:'numeric', month:'short'});
+}
+
+function buildWeeks(userGates) {
+  const today = new Date();
+  today.setHours(12,0,0,0);
+  const anchor = new Date(2026,2,6,12,0,0);
+  const weeks = [];
+  for (let w = 0; w < 12; w++) {
+    const weekStart = addDays(today, w * 7);
+    const weekEnd = addDays(today, w * 7 + 6);
+    const diff = (weekStart - anchor) / 86400000;
+    const sunDeg = 345 + diff * 0.9856;
+    const sunGate = degToGate(sunDeg);
+    const sunName = GATE_NAMES[sunGate] || '';
+    // Check if sun gate hits user gates
+    const sunHit = userGates.includes(sunGate);
+    // Moon moves ~13.176 deg/day, check a few days
+    let moonHit = false;
+    const moonGates = [];
+    for (let d = 0; d < 7; d++) {
+      const mDiff = ((weekStart - anchor) / 86400000) + d;
+      const mDeg = 180 + mDiff * 13.176;
+      const mg = degToGate(mDeg);
+      moonGates.push(mg);
+      if (userGates.includes(mg)) moonHit = true;
+    }
+    weeks.push({
+      weekNum: w + 1,
+      startDate: weekStart,
+      endDate: weekEnd,
+      dateRange: formatDate(weekStart) + ' – ' + formatDate(weekEnd),
+      sunGate, sunName, sunHit, moonHit, moonGates: [...new Set(moonGates)]
+    });
+  }
+  return weeks;
+}
+
+async function generateForecast() {
+  const dob = document.getElementById('dob').value;
+  const tob = document.getElementById('tob').value;
+  const city = document.getElementById('city').value.trim();
+  const err = document.getElementById('err1');
+
+  if (!dob || !tob || !city) {
+    err.textContent = 'Please fill in all fields.';
+    err.classList.add('show');
+    return;
+  }
+  err.classList.remove('show');
+
+  // Save to localStorage
+  try { localStorage.setItem('aw_dob', dob); localStorage.setItem('aw_tob', tob); localStorage.setItem('aw_city', city); } catch(e) {}
+
+  document.getElementById('formSection').style.display = 'none';
+  const loading = document.getElementById('loading');
+  loading.classList.add('show');
+  document.getElementById('loadingSub').textContent = 'Calculating your birth chart…';
+
+  try {
+    // 1. Get birth chart
+    const chartResp = await fetch('/api/chart', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({date: dob, time: tob, city})
+    });
+    if (!chartResp.ok) throw new Error('Chart error');
+    const chartData = await chartResp.json();
+
+    const props = chartData.Properties || {};
+    const type = props.Type?.option || 'Generator';
+    const auth = props.InnerAuthority?.option || 'Emotional';
+    const profile = props.Profile?.id || '';
+    const userGates = (chartData.Gates || []).map(g => typeof g === 'object' ? (g.gate || g.id) : g).filter(Boolean);
+
+    document.getElementById('loadingSub').textContent = 'Mapping 12 weeks of transits…';
+
+    // 2. Build 12 weeks
+    const weeks = buildWeeks(userGates);
+
+    // 3. Generate AI forecast for all 12 weeks in one call
+    document.getElementById('loadingSub').textContent = 'Generating your personalised forecast…';
+    document.getElementById('loadingWeek').textContent = 'This takes about 30 seconds';
+
+    const weeksContext = weeks.map(w =>
+      `Week ${w.weekNum} (${w.dateRange}): Sun Gate ${w.sunGate} ${w.sunName}${w.sunHit?' [HITS YOUR CHART]':''}, Moon crosses gates ${w.moonGates.join(',')}${w.moonHit?' [MOON HITS YOUR CHART]':''}`
+    ).join('\n');
+
+    const prompt = `You are a master Human Design analyst. Generate a 12-week personalised forecast.
+
+Person: ${type}, ${auth} Authority, Profile ${profile}
+Their defined gates: ${userGates.join(', ')}
+
+Weekly transit data:
+${weeksContext}
+
+Return ONLY valid JSON (no markdown, no preamble):
+{
+  "overallTheme": "2 sentences: the dominant theme of this 12-week period for this person",
+  "peakPeriod": "Which 2-3 weeks are the highest energy peak for action and why",
+  "restPeriod": "Which 1-2 weeks to protect energy and why",
+  "bigMove": "The single most important strategic move to make in the next 12 weeks based on their type and the transits",
+  "weeks": [
+    {
+      "weekNum": 1,
+      "theme": "4-6 words: the energy theme of this week",
+      "focus": "1 sentence: what to lean into this week",
+      "avoid": "1 sentence: what to watch out for",
+      "opportunity": "1 sentence: the specific opportunity or window this week",
+      "energyLevel": "high|medium|low",
+      "icon": "one of: ☀ ✦ ☽ → 〇 ◇"
+    }
+  ]
+}
+
+Generate all 12 weeks. Be specific to their gates and type. No generic advice.`;
+
+    const guideResp = await fetch('/api/guide', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({messages:[{role:'user',content:prompt}]})
+    });
+
+    if (!guideResp.ok) throw new Error('Guide error ' + guideResp.status);
+    const guideData = await guideResp.json();
+    if (!guideData.content) throw new Error('No content returned');
+
+    const raw = guideData.content.map(b => b.text||'').join('').replace(/```json|```/g,'').trim();
+    const forecast = JSON.parse(raw);
+
+    loading.classList.remove('show');
+    renderForecast(forecast, weeks, type, auth, profile);
+
+  } catch(e) {
+    loading.classList.remove('show');
+    document.getElementById('formSection').style.display = '';
+    err.textContent = 'Could not generate forecast: ' + e.message + '. Please try again.';
+    err.classList.add('show');
+    console.error(e);
+  }
+}
+
+function toggleWeek(n) {
+  const body = document.getElementById('wb-' + n);
+  const chev = document.getElementById('wc-' + n);
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function renderForecast(forecast, weeks, type, auth, profile) {
+  const results = document.getElementById('results');
+
+  const weekCards = (forecast.weeks || []).map((w, i) => {
+    const wData = weeks[i] || {};
+    const isPeak = w.energyLevel === 'high';
+    const isRest = w.energyLevel === 'low';
+    return `
+      <div class="week-card${isPeak?' peak':isRest?' rest':''}">
+        <div class="week-header" onclick="toggleWeek(${w.weekNum})">
+          <div class="week-left">
+            <div class="week-icon">${w.icon||'◇'}</div>
+            <div>
+              <div class="week-num">Week ${w.weekNum} · ${wData.dateRange||''}</div>
+              <div class="week-theme">${w.theme||''}</div>
+            </div>
+          </div>
+          <div>
+            ${wData.sunHit ? '<span style="font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-right:12px">☀ Your gate</span>' : ''}
+            ${wData.moonHit ? '<span style="font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#7a6ea0;margin-right:12px">☽ Moon hit</span>' : ''}
+            <span class="week-chevron" id="wc-${w.weekNum}">▾</span>
+          </div>
+        </div>
+        <div class="week-body" id="wb-${w.weekNum}">
+          <div class="week-field">
+            <div class="week-field-label green">↑ Focus</div>
+            <div class="week-field-text">${w.focus||''}</div>
+          </div>
+          <div class="week-field">
+            <div class="week-field-label red">✕ Avoid</div>
+            <div class="week-field-text">${w.avoid||''}</div>
+          </div>
+          <div class="week-field" style="grid-column:1/-1">
+            <div class="week-field-label">◎ Opportunity</div>
+            <div class="week-field-text">${w.opportunity||''}</div>
+          </div>
+          <div class="week-gates">
+            <span class="gate-tag${wData.sunHit?' hit':''}">☀ Gate ${wData.sunGate}: ${wData.sunName}</span>
+            ${wData.moonGates.slice(0,3).map(g=>`<span class="gate-tag">☽ Gate ${g}</span>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  results.innerHTML = `
+    <div class="results-header">
+      <div class="label">Your 12-Week Forecast</div>
+      <h2>${forecast.overallTheme||'Your quarter ahead'}</h2>
+      <div class="meta">${type} · Profile ${profile} · ${auth} Authority</div>
+    </div>
+
+    <div class="quarter-overview">
+      <div class="quarter-card">
+        <div class="quarter-card-label">⚡ Peak Period</div>
+        <div class="quarter-card-text">${forecast.peakPeriod||''}</div>
+      </div>
+      <div class="quarter-card">
+        <div class="quarter-card-label">〇 Rest Period</div>
+        <div class="quarter-card-text">${forecast.restPeriod||''}</div>
+      </div>
+      <div class="quarter-card">
+        <div class="quarter-card-label">→ Your Big Move</div>
+        <div class="quarter-card-text">${forecast.bigMove||''}</div>
+      </div>
+    </div>
+
+    ${weekCards}
+
+    <div class="download-section">
+      <button class="btn-primary" style="max-width:320px;margin:0 auto;display:block" onclick="downloadICS()">Download to Calendar (.ics)</button>
+      <div class="download-note">Works with Google Calendar, Apple Calendar & Outlook</div>
+    </div>
+
+    <p class="footer-note" style="margin-top:32px">
+      <button class="btn-secondary" onclick="resetForecast()" style="margin-bottom:16px">← Generate again</button><br>
+      Birth chart & transits via <a href="https://bodygraphchart.com" target="_blank">bodygraphchart.com</a>
+    </p>
+  `;
+
+  // Store for ICS download
+  window._forecastData = { forecast, weeks };
+
+  results.classList.add('show');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function downloadICS() {
+  const { forecast, weeks } = window._forecastData || {};
+  if (!forecast || !weeks) return;
+
+  function escICS(str) {
+    return (str||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');
+  }
+
+  const year = new Date().getFullYear();
+  let lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Aligned Week//12-Week Forecast//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
+
+  (forecast.weeks||[]).forEach((w,i) => {
+    const wData = weeks[i];
+    if (!wData) return;
+    const d = wData.startDate;
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    const yy = d.getFullYear();
+    const icsDate = '' + yy + mm + dd;
+    const dEnd = wData.endDate;
+    const mm2 = String(dEnd.getMonth()+1).padStart(2,'0');
+    const dd2 = String(dEnd.getDate()).padStart(2,'0');
+    const icsEnd = '' + dEnd.getFullYear() + mm2 + dd2;
+    lines = lines.concat([
+      'BEGIN:VEVENT',
+      'UID:w' + w.weekNum + '-forecast-alignedweek@aligned-week.vercel.app',
+      'DTSTART;VALUE=DATE:' + icsDate,
+      'DTEND;VALUE=DATE:' + icsEnd,
+      'SUMMARY:' + escICS((w.icon||'') + ' ' + (w.theme||'')),
+      'DESCRIPTION:' + escICS('FOCUS: ' + (w.focus||'') + '\\nAVOID: ' + (w.avoid||'') + '\\nOPPORTUNITY: ' + (w.opportunity||'')),
+      'END:VEVENT'
+    ]);
+  });
+  lines.push('END:VCALENDAR');
+
+  const blob = new Blob([lines.join('\r\n')], {type:'text/calendar;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'aligned-quarter.ics';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function resetForecast() {
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('formSection').style.display = '';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+</body>
+</html>
