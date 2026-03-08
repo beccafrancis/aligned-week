@@ -318,7 +318,7 @@ Generate all 12 weeks. Be specific to their gates and type. No generic advice.`;
     const forecast = JSON.parse(raw);
 
     loading.classList.remove('show');
-    renderForecast(forecast, weeks, type, auth, profile);
+    renderForecast(forecast, weeks, type, auth, profile, userGates);
 
   } catch(e) {
     loading.classList.remove('show');
@@ -336,7 +336,7 @@ function toggleWeek(n) {
   chev.classList.toggle('open');
 }
 
-function renderForecast(forecast, weeks, type, auth, profile) {
+function renderForecast(forecast, weeks, type, auth, profile, userGates) {
   const results = document.getElementById('results');
 
   const weekCards = (forecast.weeks || []).map((w, i) => {
@@ -375,6 +375,13 @@ function renderForecast(forecast, weeks, type, auth, profile) {
           <div class="week-gates">
             <span class="gate-tag${wData.sunHit?' hit':''}">☀ Gate ${wData.sunGate}: ${wData.sunName}</span>
             ${wData.moonGates.slice(0,3).map(g=>`<span class="gate-tag">☽ Gate ${g}</span>`).join('')}
+          </div>
+          <div class="days-section">
+            <button class="days-btn" id="days-btn-${w.weekNum}" onclick="generateDays(${w.weekNum})">
+              ↓ Generate day-by-day breakdown for this week
+            </button>
+            <div class="days-loading" id="days-loading-${w.weekNum}">Generating your daily plan…</div>
+            <div class="day-cards" id="day-cards-${w.weekNum}"></div>
           </div>
         </div>
       </div>`;
@@ -415,11 +422,83 @@ function renderForecast(forecast, weeks, type, auth, profile) {
     </p>
   `;
 
-  // Store for ICS download
-  window._forecastData = { forecast, weeks };
+  // Store for ICS download and day generation
+  window._forecastData = { forecast, weeks, userInfo: { type, auth, profile, userGates: userGates || [] } };
 
   results.classList.add('show');
   window.scrollTo({top:0, behavior:'smooth'});
+}
+
+async function generateDays(weekNum) {
+  const { forecast, weeks, userInfo } = window._forecastData || {};
+  if (!forecast || !weeks) return;
+
+  const btn = document.getElementById('days-btn-' + weekNum);
+  const loadingEl = document.getElementById('days-loading-' + weekNum);
+  const cardsEl = document.getElementById('day-cards-' + weekNum);
+  const wData = weeks[weekNum - 1];
+  const wForecast = (forecast.weeks || []).find(w => w.weekNum === weekNum);
+  if (!wData || !wForecast) return;
+
+  btn.disabled = true;
+  btn.style.display = 'none';
+  loadingEl.classList.add('show');
+
+  const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const anchor = new Date(2026,2,6,12,0,0);
+
+  const days = Array.from({length:7}, (_, i) => {
+    const d = new Date(wData.startDate);
+    d.setDate(d.getDate() + i);
+    const diff = (d - anchor) / 86400000;
+    const sunGate = degToGate(345 + diff * 0.9856);
+    const moonGate = degToGate(180 + diff * 13.176);
+    const sunHit = (userInfo.userGates||[]).includes(sunGate);
+    const moonHit = (userInfo.userGates||[]).includes(moonGate);
+    return { dayName: dayNames[d.getDay()], dateStr: d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}), sunGate, moonGate, sunHit, moonHit };
+  });
+
+  const daysContext = days.map(d =>
+    d.dayName + ' ' + d.dateStr + ': Sun Gate ' + d.sunGate + (d.sunHit?' [YOUR GATE]':'') + ', Moon Gate ' + d.moonGate + (d.moonHit?' [YOUR GATE]':'')
+  ).join('\n');
+
+  const prompt = 'You are a master Human Design analyst. Generate a day-by-day breakdown for one specific week.\n\nPerson: ' + (userInfo.type||'Generator') + ', ' + (userInfo.auth||'Emotional') + ' Authority, Profile ' + (userInfo.profile||'') + '\nTheir defined gates: ' + (userInfo.userGates||[]).join(', ') + '\nWeek theme: ' + (wForecast.theme||'') + '\nWeek focus: ' + (wForecast.focus||'') + '\n\nDaily transits:\n' + daysContext + '\n\nReturn ONLY valid JSON (no markdown):\n{"days":[{"day":"Sunday","date":"8 Mar","energyWord":"Two punchy sentences. Like a best friend texting.","focus":"1 sentence","avoid":"1 sentence","window":"1 sentence"}]}\n\nGenerate all 7 days. Be specific to their gates. No jargon.';
+
+  try {
+    const resp = await fetch('/api/guide', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({messages:[{role:'user', content:prompt}]})
+    });
+    const data = await resp.json();
+    const raw = (data.content||[]).map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(raw);
+
+    loadingEl.classList.remove('show');
+
+    const dayHTML = (parsed.days||[]).map((d, i) => {
+      const dData = days[i] || {};
+      const isHit = dData.sunHit || dData.moonHit;
+      return '<div class="day-card' + (isHit?' hit':'') + '">' +
+        '<div class="day-card-header"><span class="day-name">' + (d.day||'') + '</span><span class="day-date">' + (d.date||'') + '</span></div>' +
+        '<div class="day-energy">' + (d.energyWord||'') + '</div>' +
+        '<div class="day-fields">' +
+        '<div><div class="day-field-label green">↑ Focus</div><div class="day-field-text">' + (d.focus||'') + '</div></div>' +
+        '<div><div class="day-field-label red">✕ Avoid</div><div class="day-field-text">' + (d.avoid||'') + '</div></div>' +
+        '<div style="grid-column:1/-1"><div class="day-field-label muted">◎ Best Window</div><div class="day-field-text">' + (d.window||'') + '</div></div>' +
+        '</div></div>';
+    }).join('');
+
+    cardsEl.innerHTML = dayHTML;
+    cardsEl.classList.add('show');
+
+  } catch(e) {
+    loadingEl.classList.remove('show');
+    btn.style.display = '';
+    btn.disabled = false;
+    btn.textContent = 'Retry daily breakdown';
+    console.error(e);
+  }
 }
 
 function downloadICS() {
