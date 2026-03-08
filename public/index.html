@@ -750,6 +750,18 @@ function buildFallback() {
 // ════════════════════════════════════════════
 // STEP 1 — Calculate chart from birth data
 // ════════════════════════════════════════════
+// Pre-fill saved birth data on load
+(function() {
+  try {
+    const dob = localStorage.getItem("aw_dob");
+    const tob = localStorage.getItem("aw_tob");
+    const city = localStorage.getItem("aw_city");
+    if (dob) document.getElementById("dob").value = dob;
+    if (tob) document.getElementById("tob").value = tob;
+    if (city) document.getElementById("city").value = city;
+  } catch(e) {}
+})();
+
 async function calculateChart() {
   const dob  = document.getElementById('dob').value;
   const tob  = document.getElementById('tob').value;
@@ -793,6 +805,8 @@ async function calculateChart() {
 
   userGates = chartData.gates || [];
   renderStrip(weekTransits[0].pos, userGates);
+  // Save birth data to localStorage
+  try { localStorage.setItem("aw_dob", dob); localStorage.setItem("aw_tob", tob); localStorage.setItem("aw_city", city); } catch(e) {}
   hideLoading();
   showPanel2();
 }
