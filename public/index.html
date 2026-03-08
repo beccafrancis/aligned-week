@@ -1336,10 +1336,11 @@ function addToGoogleCalendar() {
     const icsDate = toICSDate(d.dateStr || d.date || '');
     if (!icsDate) return;
 
-    const title = 'HD: ' + escICS((day.energyWord || day.focus || '').substring(0, 60));
-    const desc = 'FOCUS: ' + escICS(day.focus || '') +
-      '\\nAVOID: ' + escICS(day.avoid || '') +
-      '\\nBEST WINDOW: ' + escICS(day.window || '');
+    const title = '✦ ' + escICS((day.energyWord || '').substring(0, 80)) || ('HD ' + (d.dayName || ''));
+    const desc = '↑ FOCUS: ' + escICS(day.focus || '') +
+      '\\n\\n✕ AVOID: ' + escICS(day.avoid || '') +
+      '\\n\\n◎ BEST WINDOW: ' + escICS(day.window || '') +
+      '\\n\\n☀ Sun Gate ' + (day.sunGate || '') + ' · ☽ Moon Gate ' + (day.moonGate || '');
 
     const uid = icsDate + '-alignedweek-' + i + '@aligned-week.vercel.app';
 
