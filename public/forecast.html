@@ -472,11 +472,42 @@ async function generateDays(weekNum) {
     });
     const data = await resp.json();
     let raw = (data.content||[]).map(b=>b.text||'').join('').trim();
-    // Extract JSON from response even if wrapped in text
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('No JSON in response');
-    raw = jsonMatch[0];
-    const parsed = JSON.parse(raw);
+    let parsed;
+    // Try JSON first
+    try {
+      const jsonMatch = raw.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        parsed = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('no json');
+      }
+    } catch(parseErr) {
+      // Fallback: parse plain text into day objects
+      const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const parsedDays = [];
+      let currentDay = null;
+      const lines = raw.split('\n').map(l=>l.trim()).filter(Boolean);
+      for (const line of lines) {
+        // Detect day header like "Sunday8 Mar" or "Sunday 8 Mar"
+        const dayMatch = dayNames.find(d => line.startsWith(d));
+        if (dayMatch) {
+          if (currentDay) parsedDays.push(currentDay);
+          currentDay = {day: dayMatch, date: line.replace(dayMatch,'').trim(), energyWord:'', focus:'', avoid:'', window:''};
+          continue;
+        }
+        if (!currentDay) continue;
+        if (line === '↑ Focus' || line === 'Focus') { currentDay._next = 'focus'; continue; }
+        if (line === '✕ Avoid' || line === 'Avoid') { currentDay._next = 'avoid'; continue; }
+        if (line === '◎ Best Window' || line === 'Best Window') { currentDay._next = 'window'; continue; }
+        if (currentDay._next === 'focus' && !currentDay.focus) { currentDay.focus = line; continue; }
+        if (currentDay._next === 'avoid' && !currentDay.avoid) { currentDay.avoid = line; continue; }
+        if (currentDay._next === 'window' && !currentDay.window) { currentDay.window = line; continue; }
+        if (!currentDay.energyWord && !currentDay._next) { currentDay.energyWord = line; continue; }
+        if (!currentDay.energyWord) { currentDay.energyWord = line; }
+      }
+      if (currentDay) parsedDays.push(currentDay);
+      parsed = { days: parsedDays };
+    }
 
     loadingEl.classList.remove('show');
 
