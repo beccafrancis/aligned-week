@@ -1,16 +1,16 @@
 {
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
     },
     {
-      "source": "/forecast",
-      "destination": "/public/forecast.html"
+      "src": "/forecast",
+      "dest": "/public/forecast.html"
     },
     {
-      "source": "/(.*)",
-      "destination": "/public/index.html"
+      "src": "/(.*)",
+      "dest": "/public/index.html"
     }
   ]
 }
