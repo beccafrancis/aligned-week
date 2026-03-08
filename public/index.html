@@ -1165,6 +1165,18 @@ function renderResults(g, type, auth, profile, gates, days, todayPos) {
       </div>
     </div>
 
+    <div class="card">
+      <div class="card-head"><span class="card-n">01</span><span class="card-t">Day by Day · Sun & Moon Gates</span></div>
+      ${daysHTML}
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-n">02</span><span class="card-t">Your Best Windows for Action</span></div>
+      <div class="card-b">${g.bestDays}</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-n">03</span><span class="card-t">Your Strategy This Week</span></div>
+      <div class="card-b">${g.strategy}</div>
+    </div>
     <div class="highlight">
       <span class="hl-label">☀ Sun in Gate ${sunGate} · ${sunName}</span>
       ${g.sunNote}
@@ -1172,18 +1184,6 @@ function renderResults(g, type, auth, profile, gates, days, todayPos) {
     <div class="moon-hl">
       <span class="hl-label">☽ Moon transits this week</span>
       ${g.moonNote}
-    </div>
-    <div class="card">
-      <div class="card-head"><span class="card-n">01</span><span class="card-t">Your Strategy This Week</span></div>
-      <div class="card-b">${g.strategy}</div>
-    </div>
-    <div class="card">
-      <div class="card-head"><span class="card-n">02</span><span class="card-t">Day by Day · Sun & Moon Gates</span></div>
-      ${daysHTML}
-    </div>
-    <div class="card">
-      <div class="card-head"><span class="card-n">03</span><span class="card-t">Your Best Windows for Action</span></div>
-      <div class="card-b">${g.bestDays}</div>
     </div>
     <div class="card">
       <div class="card-head"><span class="card-n">04</span><span class="card-t">Planetary Background Field</span></div>
