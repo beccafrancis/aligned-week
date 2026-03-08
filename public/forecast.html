@@ -462,7 +462,7 @@ async function generateDays(weekNum) {
     d.dayName + ' ' + d.dateStr + ': Sun Gate ' + d.sunGate + (d.sunHit?' [YOUR GATE]':'') + ', Moon Gate ' + d.moonGate + (d.moonHit?' [YOUR GATE]':'')
   ).join('\n');
 
-  const prompt = 'You are a master Human Design analyst. Generate a day-by-day breakdown for one specific week.\n\nPerson: ' + (userInfo.type||'Generator') + ', ' + (userInfo.auth||'Emotional') + ' Authority, Profile ' + (userInfo.profile||'') + '\nTheir defined gates: ' + (userInfo.userGates||[]).join(', ') + '\nWeek theme: ' + (wForecast.theme||'') + '\nWeek focus: ' + (wForecast.focus||'') + '\n\nDaily transits:\n' + daysContext + '\n\nReturn ONLY valid JSON (no markdown):\n{"days":[{"day":"Sunday","date":"8 Mar","energyWord":"Two punchy sentences. Like a best friend texting.","focus":"1 sentence","avoid":"1 sentence","window":"1 sentence"}]}\n\nGenerate all 7 days. Be specific to their gates. No jargon.';
+  const prompt = 'RESPOND WITH JSON ONLY. NO TEXT BEFORE OR AFTER. NO MARKDOWN. START WITH { AND END WITH }.\n\nHuman Design analyst task: day-by-day breakdown.\nPerson: ' + (userInfo.type||'Generator') + ', ' + (userInfo.auth||'Emotional') + ' Authority, Profile ' + (userInfo.profile||'') + '\nGates: ' + (userInfo.userGates||[]).join(',') + '\nWeek: ' + (wForecast.theme||'') + '\nTransits:\n' + daysContext + '\n\nJSON format (exactly this structure, all 7 days):\n{"days":[{"day":"Sunday","date":"8 Mar","energyWord":"Short punchy sentence. Second sentence.","focus":"one sentence","avoid":"one sentence","window":"one sentence"},{"day":"Monday","date":"9 Mar","energyWord":"...","focus":"...","avoid":"...","window":"..."}]}\n\nRules: energyWord = 2 short punchy sentences like a friend texting. No HD jargon. Specific to their gates.';
 
   try {
     const resp = await fetch('/api/guide', {
@@ -471,7 +471,11 @@ async function generateDays(weekNum) {
       body: JSON.stringify({messages:[{role:'user', content:prompt}]})
     });
     const data = await resp.json();
-    const raw = (data.content||[]).map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+    let raw = (data.content||[]).map(b=>b.text||'').join('').trim();
+    // Extract JSON from response even if wrapped in text
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No JSON in response');
+    raw = jsonMatch[0];
     const parsed = JSON.parse(raw);
 
     loadingEl.classList.remove('show');
