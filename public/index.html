@@ -1196,23 +1196,24 @@ function renderResults(g, type, auth, profile, gates, days, todayPos) {
       <div class="ci-label" style="margin-bottom:16px">Your Week at a Glance</div>
       <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px">
         ${(g.days||[]).map(d => {
-          const isHit = d.sunHit || d.moonHit;
           const w = (d.energyWord||'').toLowerCase();
-          const isRest = /rest|slow|quiet|protect|pause|reflect|hold|wait|still/.test(w);
-          const isAction = /send|launch|make|say|move|act|speak|push|ship|call|go/.test(w);
+          const isRest = /rest|slow|quiet|protect|pause|reflect|hold|wait|still|breathe/.test(w);
+          const isAction = /send|launch|make|say|move|act|speak|push|ship|call|go|do it|trust/.test(w);
           const isMoon = d.moonHit;
-          const isSun = d.sunHit && !d.moonHit;
-          let bg, border, dotColor, icon;
-          if (isRest) { bg='rgba(180,170,155,0.12)'; border='var(--border)'; dotColor='var(--muted)'; icon='☽'; }
-          else if (isAction && isHit) { bg='rgba(74,107,58,0.12)'; border='var(--border-accent)'; dotColor='var(--accent)'; icon='⚡'; }
-          else if (isAction) { bg='rgba(74,107,58,0.07)'; border='var(--border-accent)'; dotColor='var(--accent)'; icon='↑'; }
-          else if (isMoon) { bg='rgba(120,110,160,0.08)'; border='1px solid rgba(120,110,160,0.3)'; dotColor='#7a6ea0'; icon='☽'; }
-          else if (isSun) { bg='var(--accent-light)'; border='var(--border-accent)'; dotColor='var(--accent)'; icon='☀'; }
-          else { bg='var(--surface)'; border='var(--border)'; dotColor='var(--muted)'; icon='·'; }
-          return `<div style="text-align:center;padding:12px 4px 10px;border:1px solid ${border};background:${bg};position:relative">
-            <div style="font-size:14px;margin-bottom:4px;opacity:0.7">${icon}</div>
-            <div style="font-size:9px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px">${(d.day||'').substring(0,3)}</div>
-            <div style="font-size:10px;font-weight:400;color:${dotColor};line-height:1.35">${d.energyWord||''}</div>
+          const isSun = d.sunHit;
+          const isBoth = d.sunHit && d.moonHit;
+          let bg, border, dotColor, icon, iconSize;
+          if (isBoth) { bg='linear-gradient(135deg,rgba(74,107,58,0.13),rgba(120,110,160,0.10))'; border='var(--border-accent)'; dotColor='var(--accent)'; icon='✦'; iconSize='18px'; }
+          else if (isSun && isAction) { bg='rgba(74,107,58,0.12)'; border='var(--border-accent)'; dotColor='var(--accent)'; icon='☀'; iconSize='18px'; }
+          else if (isSun) { bg='var(--accent-light)'; border='var(--border-accent)'; dotColor='var(--accent)'; icon='☀'; iconSize='16px'; }
+          else if (isMoon) { bg='rgba(120,110,160,0.09)'; border='1px solid rgba(120,110,160,0.25)'; dotColor='#7a6ea0'; icon='☽'; iconSize='16px'; }
+          else if (isRest) { bg='rgba(180,170,155,0.08)'; border='var(--border)'; dotColor='var(--muted)'; icon='〇'; iconSize='14px'; }
+          else if (isAction) { bg='rgba(74,107,58,0.07)'; border='1px solid rgba(74,107,58,0.2)'; dotColor='var(--accent)'; icon='→'; iconSize='16px'; }
+          else { bg='var(--surface)'; border='var(--border)'; dotColor='var(--text)'; icon='◇'; iconSize='13px'; }
+          return `<div style="text-align:center;padding:16px 6px 14px;border:1px solid ${border};background:${bg}">
+            <div style="font-size:${iconSize};margin-bottom:6px;line-height:1;color:${dotColor};opacity:0.85">${icon}</div>
+            <div style="font-size:9px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">${(d.day||'').substring(0,3)}</div>
+            <div style="font-size:10px;font-weight:400;color:${dotColor};line-height:1.4">${d.energyWord||''}</div>
           </div>`;
         }).join('')}
       </div>
