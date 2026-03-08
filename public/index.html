@@ -736,7 +736,7 @@ function renderStrip(pos, uGates) {
     const hit = d && uGates.includes(d.gate);
     const hitCls = hit ? (p.k==='moon' ? 'hit-moon' : 'hit-sun') : '';
     return `<div class="pcell ${hitCls}">
-      <div class="p-label ${p.cls}">${p.lbl}</div><span class="p-label-text">${p.txt}</span><span class="p-label-text">${p.txt}</span><span class="p-label-text">${p.txt}</span>
+      <div class="p-label ${p.cls}">${p.lbl}</div><div class="p-label-text">${p.txt}</div>
       <div class="p-gate">${d?.gate ?? '—'}</div>
       <div class="p-name">${d?.gname ?? ''}</div>
       ${hit ? '<div class="p-hit-tag">Your gate</div>' : ''}
