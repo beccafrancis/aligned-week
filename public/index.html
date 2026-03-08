@@ -1270,7 +1270,7 @@ function renderResults(g, type, auth, profile, gates, days, todayPos) {
       <div class="aff-label">Gate ${sunGate} · Your Week</div>
     </div>
     <div style="text-align:center;margin-top:28px;">
-      <button class="btn-primary" onclick="addToGoogleCalendar()" style="margin-bottom:12px;width:100%;max-width:320px;display:block;margin-left:auto;margin-right:auto">Add My Week to Google Calendar</button>
+      <button class="btn-primary" onclick="addToGoogleCalendar()" style="margin-bottom:12px;width:100%;max-width:320px;display:block;margin-left:auto;margin-right:auto">Download My Week (.ics — Google Calendar & Notion)</button>
       <button class="btn-secondary" onclick="resetAll()">← Start over</button>
     </div>
     <p class="footer-note">Birth chart &amp; transits via <a href="https://bodygraphchart.com" target="_blank">bodygraphchart.com</a></p>
@@ -1304,25 +1304,67 @@ function setStep(n) {
 function addToGoogleCalendar() {
   const guide = window._lastGuide;
   const days = window._lastDays;
-  if (!guide || !days) return;
+  if (!guide || !days) { alert('Please generate your weekly guide first.'); return; }
+
+  const months = {Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
+  const year = new Date().getFullYear();
+
+  function escICS(str) {
+    return (str || '').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');
+  }
+
+  function toICSDate(dateStr) {
+    const parts = (dateStr || '').match(/(\d+)\s+(\w+)/);
+    if (!parts) return null;
+    const mm = months[parts[2]];
+    if (!mm) return null;
+    const dd = String(parts[1]).padStart(2,'0');
+    return year + mm + dd;
+  }
+
+  let icsLines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Aligned Week//Human Design Guide//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH'
+  ];
+
   days.forEach((d, i) => {
     const day = guide.days && guide.days[i];
     if (!day) return;
-    const dateStr = d.dateStr || d.date || '';
-    const parts = dateStr.match(/(\d+)\s+(\w+)/);
-    if (!parts) return;
-    const months = {Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
-    const month = months[parts[2]];
-    if (!month) return;
-    const year = new Date().getFullYear();
-    const dd = String(parts[1]).padStart(2,'0');
-    const mm = String(month).padStart(2,'0');
-    const dateParam = year + mm + dd;
-    const title = encodeURIComponent('HD: ' + (day.focus || '').substring(0, 50));
-    const details = encodeURIComponent('FOCUS: ' + (day.focus || '') + ' | AVOID: ' + (day.avoid || '') + ' | BEST WINDOW: ' + (day.window || ''));
-    const url = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + title + '&dates=' + dateParam + '/' + dateParam + '&details=' + details;
-    setTimeout(() => window.open(url, '_blank'), i * 300);
+    const icsDate = toICSDate(d.dateStr || d.date || '');
+    if (!icsDate) return;
+
+    const title = 'HD: ' + escICS((day.energyWord || day.focus || '').substring(0, 60));
+    const desc = 'FOCUS: ' + escICS(day.focus || '') +
+      '\\nAVOID: ' + escICS(day.avoid || '') +
+      '\\nBEST WINDOW: ' + escICS(day.window || '');
+
+    const uid = icsDate + '-alignedweek-' + i + '@aligned-week.vercel.app';
+
+    icsLines = icsLines.concat([
+      'BEGIN:VEVENT',
+      'UID:' + uid,
+      'DTSTART;VALUE=DATE:' + icsDate,
+      'DTEND;VALUE=DATE:' + icsDate,
+      'SUMMARY:' + title,
+      'DESCRIPTION:' + desc,
+      'END:VEVENT'
+    ]);
   });
+
+  icsLines.push('END:VCALENDAR');
+
+  const blob = new Blob([icsLines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'aligned-week.ics';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 function resetAll() {
