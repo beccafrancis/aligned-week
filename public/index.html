@@ -1162,9 +1162,9 @@ function renderResults(g, type, auth, profile, gates, days, todayPos) {
           ${moonCh?`<span class="d-tag blue" style="font-size:6px">${moonCh}</span>`:''}
         </div>
         <div class="day-right">
-          <div style="margin-bottom:8px"><span style="font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)">Focus</span><div style="font-size:13px;font-weight:300;color:var(--text);margin-top:3px;line-height:1.5">${d.focus||d.guidance||''}</div></div>
-          <div style="margin-bottom:8px"><span style="font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#C0402A">Avoid</span><div style="font-size:13px;font-weight:300;color:var(--text);margin-top:3px;line-height:1.5">${d.avoid||''}</div></div>
-          <div><span style="font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Best Window</span><div style="font-size:13px;font-weight:300;color:var(--text);margin-top:3px;line-height:1.5">${d.window||''}</div></div>
+          <div style="margin-bottom:10px;padding-left:10px;border-left:2px solid var(--accent)"><span style="font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)">↑ Focus</span><div style="font-size:13px;font-weight:300;color:var(--text);margin-top:3px;line-height:1.5">${d.focus||d.guidance||''}</div></div>
+          <div style="margin-bottom:10px;padding-left:10px;border-left:2px solid #C0402A"><span style="font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#C0402A">✕ Avoid</span><div style="font-size:13px;font-weight:300;color:var(--text);margin-top:3px;line-height:1.5">${d.avoid||''}</div></div>
+          <div style="padding-left:10px;border-left:2px solid var(--muted)"><span style="font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">◎ Best Window</span><div style="font-size:13px;font-weight:300;color:var(--text);margin-top:3px;line-height:1.5">${d.window||''}</div></div>
         </div>
       </div>`;
   }).join('');
