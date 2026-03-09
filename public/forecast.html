@@ -208,26 +208,42 @@ function formatDate(d) {
 function buildWeeks(userGates) {
   const today = new Date();
   today.setHours(12,0,0,0);
-  const anchor = new Date(2026,2,6,12,0,0);
+  const // Fetch real transit data for each week from the API
   const weeks = [];
   for (let w = 0; w < 4; w++) {
     const weekStart = addDays(today, w * 7);
     const weekEnd = addDays(today, w * 7 + 6);
-    const diff = (weekStart - anchor) / 86400000;
-    const sunDeg = 345 + diff * 0.9856;
-    const sunGate = degToGate(sunDeg);
-    const sunName = GATE_NAMES[sunGate] || '';
-    // Check if sun gate hits user gates
-    const sunHit = userGates.includes(sunGate);
-    // Moon moves ~13.176 deg/day, check a few days
-    let moonHit = false;
+    // Fetch transits for mid-week (day 3) for Sun position accuracy
+    const midWeek = addDays(today, w * 7 + 3);
+    const dateStr = midWeek.toISOString().slice(0,10);
+    let sunGate = '?', sunName = '', sunHit = false, moonHit = false;
     const moonGates = [];
-    for (let d = 0; d < 7; d++) {
-      const mDiff = ((weekStart - anchor) / 86400000) + d;
-      const mDeg = 180 + mDiff * 13.176;
-      const mg = degToGate(mDeg);
-      moonGates.push(mg);
-      if (userGates.includes(mg)) moonHit = true;
+    try {
+      // Fetch transits for each day of the week to get accurate Moon gates
+      const dayFetches = [];
+      for (let d = 0; d < 7; d++) {
+        const day = addDays(today, w * 7 + d);
+        const ds = day.toISOString().slice(0,10);
+        dayFetches.push(fetch('/api/transits?date=' + ds + '+12:00').then(r => r.json()));
+      }
+      const dayResults = await Promise.all(dayFetches);
+      // Sun from mid-week
+      const midResult = dayResults[3] || dayResults[0];
+      const sunPos = midResult?.planets?.find?.(p => p.name === 'sun') || midResult?.sun;
+      sunGate = sunPos?.gate || midResult?.sunGate || '?';
+      sunName = GATE_NAMES[sunGate] || '';
+      sunHit = userGates.includes(Number(sunGate));
+      // Moon gates from all 7 days
+      for (const dr of dayResults) {
+        const moonPos = dr?.planets?.find?.(p => p.name === 'moon') || dr?.moon;
+        const mg = moonPos?.gate || dr?.moonGate;
+        if (mg) {
+          moonGates.push(mg);
+          if (userGates.includes(Number(mg))) moonHit = true;
+        }
+      }
+    } catch(e) {
+      console.warn('Transit fetch failed for week', w, e);
     }
     weeks.push({
       weekNum: w + 1,
