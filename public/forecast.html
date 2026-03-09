@@ -468,7 +468,7 @@ async function generateDays(weekNum) {
     const resp = await fetch('/api/guide', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({messages:[{role:'user', content:prompt}]})
+      body: JSON.stringify({system:'You are a JSON API. You output only valid JSON. Never output prose or explanation. Your entire response must be a single JSON object starting with { and ending with }.', messages:[{role:'user', content:prompt}]})
     });
     const data = await resp.json();
     let raw = (data.content||[]).map(b=>b.text||'').join('').trim();
