@@ -123,7 +123,7 @@ input:focus { border-color:var(--accent); }
     .day-name { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 600; color: var(--text); }
     .day-date { font-size: 0.8rem; color: var(--muted); }
     .day-energy { font-size: 0.9rem; color: var(--text); margin-bottom: 12px; line-height: 1.5; }
-    .day-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .day-fields { display: flex; flex-direction: column; gap: 8px; }
     .day-field-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px; }
     .day-field-label.green { color: var(--accent); }
     .day-field-label.red { color: #C0402A; }
@@ -302,17 +302,17 @@ Ground every insight in this person's specific Human Design — their Type, Auth
 
 Return ONLY valid JSON (no markdown, no preamble):
 {
-  "overallTheme": "2 sentences: the dominant theme of this 4-week period for this person",
+  "overallTheme": "2 sentences. Sentence 1: name 1-2 specific gates or channels that dominate these 4 weeks and what they mean for this person's Type. Sentence 2: the practical implication — what should they be doing or protecting during this period.",
   "peakPeriod": "Which 2-3 weeks are the highest energy peak for action and why",
   "restPeriod": "Which 1-2 weeks to protect energy and why",
   "bigMove": "The single most important strategic move to make in the next 4 weeks based on their type and the transits",
   "weeks": [
     {
       "weekNum": 1,
-      "theme": "4-6 words: the energy theme of this week",
-      "focus": "1 sentence: what to lean into this week",
-      "avoid": "1 sentence: what to watch out for",
-      "opportunity": "1 sentence: the specific opportunity or window this week",
+      "theme": "4-6 words using actual gate name or center. E.g. 'Gate 44 pattern recognition week' not 'week of clarity'",
+      "focus": "1 sentence naming their Type strategy and a specific gate active this week. E.g. 'Wait for your Sacral to respond to Gate 34 invitations — your body will know before your mind does'",
+      "avoid": "1 sentence naming the specific not-self pattern for their Type given this week's transits. E.g. 'Generators: don't push through resistance just because Gate 62 makes everything look fixable'",
+      "opportunity": "1 sentence naming a specific gate or channel activation and what concrete action to take. E.g. 'Moon crossing Gate 47 on Wednesday activates your defined channel — use that evening to make sense of what's been confusing'",
       "energyLevel": "high|medium|low",
       "icon": "one of: ☀ ✦ ☽ → 〇 ◇"
     }
