@@ -114,6 +114,21 @@ input:focus { border-color:var(--accent); }
   .week-body.open { grid-template-columns:1fr; }
   .week-theme { font-size:15px; }
 }
+
+    .day-cards { display: none; flex-direction: column; gap: 12px; margin-top: 16px; }
+    .day-cards.show { display: flex; }
+    .day-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; border-left: 3px solid var(--accent); }
+    .day-card.hit { border-left-color: var(--moon); }
+    .day-card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+    .day-name { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 600; color: var(--text); }
+    .day-date { font-size: 0.8rem; color: var(--muted); }
+    .day-energy { font-size: 0.9rem; color: var(--text); margin-bottom: 12px; line-height: 1.5; }
+    .day-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .day-field-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px; }
+    .day-field-label.green { color: var(--accent); }
+    .day-field-label.red { color: #C0402A; }
+    .day-field-label.muted { color: var(--muted); }
+    .day-field-text { font-size: 0.85rem; color: var(--text); line-height: 1.4; }
 </style>
 </head>
 <body>
