@@ -565,7 +565,7 @@ function downloadICS() {
       'DTSTART;VALUE=DATE:' + icsDate,
       'DTEND;VALUE=DATE:' + icsEnd,
       'SUMMARY:' + escICS((w.icon||'') + ' ' + (w.theme||'')),
-      'DESCRIPTION:' + escICS('FOCUS: ' + (w.focus||'') + '\\nAVOID: ' + (w.avoid||'') + '\\nOPPORTUNITY: ' + (w.opportunity||'')),
+      'DESCRIPTION:' + escICS('FOCUS: ' + (w.focus||'') + ' | AVOID: ' + (w.avoid||'') + ' | OPPORTUNITY: ' + (w.opportunity||'')),
       'END:VEVENT'
     ]);
   });
