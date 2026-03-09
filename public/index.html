@@ -655,6 +655,13 @@ const GATE_NAMES = {
   57:"Intuitive Clarity",58:"Joy",59:"Sexuality",60:"Limitation",
   61:"Inner Truth",62:"Detail",63:"After Completion",64:"Confusion"
 };
+
+const HD_GATE_SEQ = [13,49,30,55,37,63,22,36,25,17,21,51,42,3,27,24,2,23,8,20,16,35,45,12,15,52,39,53,62,56,31,33,7,4,29,59,40,64,47,6,46,18,48,57,32,50,28,44,1,43,14,34,9,5,26,11,10,58,38,54,61,60,41,19];
+const HD_OFFSET = 310.7;
+function degToHDGate(deg) {
+  const adjusted = ((deg - HD_OFFSET) % 360 + 360) % 360;
+  return HD_GATE_SEQ[Math.floor(adjusted / 5.625) % 64];
+}
 const EARTH_PAIRS = {1:2,2:1,3:60,4:49,5:35,6:36,7:13,8:14,9:16,10:15,11:12,12:11,13:7,14:8,15:10,16:9,17:18,18:17,19:33,20:34,21:45,22:47,23:43,24:44,25:46,26:45,27:28,28:27,29:30,30:29,31:41,32:42,33:19,34:20,35:5,36:6,37:40,38:39,39:38,40:37,41:31,42:32,43:23,44:24,45:26,46:25,47:22,48:21,49:4,50:3,51:57,52:58,53:54,54:53,55:59,56:60,57:51,58:52,59:55,60:56,61:62,62:61,63:64,64:63};
 const CHANNELS = {"1-8":"Inspiration","2-14":"The Beat","3-60":"Mutation","4-63":"Logic","5-15":"Rhythm","6-59":"Mating","7-31":"The Alpha","9-52":"Concentration","10-20":"Awakening","11-56":"Curiosity","12-22":"Openness","13-33":"The Prodigal","16-48":"Wavelength","17-62":"Acceptance","18-58":"Judgment","19-49":"Synthesis","20-57":"Brain Wave","21-45":"Money","23-43":"Structuring","24-61":"Awareness","25-51":"Initiation","26-44":"Surrender","27-50":"Preservation","28-38":"Struggle","29-46":"Discovery","30-41":"Recognition","32-54":"Transformation","34-57":"Power","35-36":"Transitoriness","37-40":"Community","39-55":"Emoting","42-53":"Maturation","47-64":"Abstraction"};
 
@@ -695,10 +702,9 @@ async function fetchWeekTransits() {
           const pos = {};
           const planets = {sun:'Sun',moon:'Moon',mercury:'Mercury',venus:'Venus',mars:'Mars',jupiter:'Jupiter',saturn:'Saturn'};
           for (const [key, name] of Object.entries(planets)) {
-            const gate = data.Personality?.[name]?.Gate ?? 0;
-            const line = data.Personality?.[name]?.Line ?? 0;
             const deg = data.Planets?.[name]?.abs_pos ?? 0;
-            pos[key] = { gate, line, deg: parseFloat(deg.toFixed(2)), gname: GATE_NAMES[gate] };
+            const gate = deg ? degToHDGate(deg) : 0;
+            pos[key] = { gate, deg: parseFloat(deg.toFixed(2)), gname: GATE_NAMES[gate] };
           }
           return { date:d, dayName: dayNames[d.getDay()], dateStr: d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}), pos };
         });
