@@ -126,8 +126,8 @@ input:focus { border-color:var(--accent); }
   <!-- Form -->
   <div class="form-section" id="formSection">
     <div class="form-intro">
-      <h1>Your next 12 weeks,<br>mapped to your design.</h1>
-      <p>Enter your birth details to generate a personalised 12-week Human Design forecast — week by week, based on your chart and live planetary transits.</p>
+      <h1>Your next 4 weeks,<br>mapped to your design.</h1>
+      <p>Enter your birth details to generate a personalised 4-week Human Design forecast — week by week, based on your chart and live planetary transits.</p>
     </div>
     <div class="form-grid">
       <div class="form-group">
@@ -195,7 +195,7 @@ function buildWeeks(userGates) {
   today.setHours(12,0,0,0);
   const anchor = new Date(2026,2,6,12,0,0);
   const weeks = [];
-  for (let w = 0; w < 12; w++) {
+  for (let w = 0; w < 4; w++) {
     const weekStart = addDays(today, w * 7);
     const weekEnd = addDays(today, w * 7 + 6);
     const diff = (weekStart - anchor) / 86400000;
@@ -262,12 +262,12 @@ async function generateForecast() {
     const profile = props.Profile?.id || '';
     const userGates = (chartData.Gates || []).map(g => typeof g === 'object' ? (g.gate || g.id) : g).filter(Boolean);
 
-    document.getElementById('loadingSub').textContent = 'Mapping 12 weeks of transits…';
+    document.getElementById('loadingSub').textContent = 'Mapping 4 weeks of transits…';
 
-    // 2. Build 12 weeks
+    // 2. Build 4 weeks
     const weeks = buildWeeks(userGates);
 
-    // 3. Generate AI forecast for all 12 weeks in one call
+    // 3. Generate AI forecast for all 4 weeks in one call
     document.getElementById('loadingSub').textContent = 'Generating your personalised forecast…';
     document.getElementById('loadingWeek').textContent = 'This takes about 30 seconds';
 
@@ -275,7 +275,7 @@ async function generateForecast() {
       `Week ${w.weekNum} (${w.dateRange}): Sun Gate ${w.sunGate} ${w.sunName}${w.sunHit?' [HITS YOUR CHART]':''}, Moon crosses gates ${w.moonGates.join(',')}${w.moonHit?' [MOON HITS YOUR CHART]':''}`
     ).join('\n');
 
-    const prompt = `You are a master Human Design analyst. Generate a 12-week personalised forecast.
+    const prompt = `You are a master Human Design analyst. Generate a 4-week personalised forecast.
 
 Person: ${type}, ${auth} Authority, Profile ${profile}
 Their defined gates: ${userGates.join(', ')}
@@ -285,10 +285,10 @@ ${weeksContext}
 
 Return ONLY valid JSON (no markdown, no preamble):
 {
-  "overallTheme": "2 sentences: the dominant theme of this 12-week period for this person",
+  "overallTheme": "2 sentences: the dominant theme of this 4-week period for this person",
   "peakPeriod": "Which 2-3 weeks are the highest energy peak for action and why",
   "restPeriod": "Which 1-2 weeks to protect energy and why",
-  "bigMove": "The single most important strategic move to make in the next 12 weeks based on their type and the transits",
+  "bigMove": "The single most important strategic move to make in the next 4 weeks based on their type and the transits",
   "weeks": [
     {
       "weekNum": 1,
@@ -302,7 +302,7 @@ Return ONLY valid JSON (no markdown, no preamble):
   ]
 }
 
-Generate all 12 weeks. Be specific to their gates and type. No generic advice.`;
+Generate all 4 weeks. Be specific to their gates and type. No generic advice.`;
 
     const guideResp = await fetch('/api/guide', {
       method: 'POST',
