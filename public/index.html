@@ -1338,9 +1338,9 @@ function addToGoogleCalendar() {
 
     const title = '✦ ' + escICS((day.energyWord || '').substring(0, 80)) || ('HD ' + (d.dayName || ''));
     const desc = '↑ FOCUS: ' + escICS(day.focus || '') +
-      '\\n\\n✕ AVOID: ' + escICS(day.avoid || '') +
-      '\\n\\n◎ BEST WINDOW: ' + escICS(day.window || '') +
-      '\\n\\n☀ Sun Gate ' + (day.sunGate || '') + ' · ☽ Moon Gate ' + (day.moonGate || '');
+      '\\n✕ AVOID: ' + escICS(day.avoid || '') +
+      '\\n◎ BEST WINDOW: ' + escICS(day.window || '') +
+      '\\n☀ Sun Gate ' + (day.sunGate || '') + ' · ☽ Moon Gate ' + (day.moonGate || '');
 
     const uid = icsDate + '-alignedweek-' + i + '@aligned-week.vercel.app';
 
