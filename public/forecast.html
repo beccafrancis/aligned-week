@@ -115,8 +115,8 @@ input:focus { border-color:var(--accent); }
   .week-theme { font-size:15px; }
 }
 
-    .day-cards { display: none; flex-direction: column; gap: 12px; margin-top: 16px; }
-    .day-cards.show { display: flex; }
+    .day-cards { display: none; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    .day-cards.show { display: grid; }
     .day-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; border-left: 3px solid var(--accent); }
     .day-card.hit { border-left-color: var(--moon); }
     .day-card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
@@ -297,6 +297,8 @@ Their defined gates: ${userGates.join(', ')}
 
 Weekly transit data:
 ${weeksContext}
+
+Ground every insight in this person's specific Human Design — their Type, Authority, defined centers, and gates. Be practical: what should they literally do or avoid each week based on their chart and the transits. No mystical language. No 'the universe', 'energy field', or 'cosmic alignment'. Just chart mechanics in plain language: 'Your Sacral will be amplified this week — use it', 'Gate 44 activates your pattern-recognition — trust what you notice'. Specific. Actionable. Human.
 
 Return ONLY valid JSON (no markdown, no preamble):
 {

@@ -519,6 +519,20 @@ h1 em { font-style: italic; color: var(--accent); }
   .chart-grid { grid-template-columns: 1fr 1fr; }
   .affirmation { padding: 36px 24px; }
 }
+
+    .day-cards { display: none; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    .day-cards.show { display: grid; }
+    .day-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; border-left: 3px solid var(--accent); }
+    .day-card.hit { border-left-color: var(--moon); }
+    .day-card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+    .day-name { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 600; color: var(--text); }
+    .day-date { font-size: 0.8rem; color: var(--muted); }
+    .day-energy { font-size: 0.9rem; color: var(--text); margin-bottom: 12px; line-height: 1.5; }
+    .day-field-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px; }
+    .day-field-label.green { color: var(--accent); }
+    .day-field-label.red { color: #C0402A; }
+    .day-field-label.muted { color: var(--muted); }
+    .day-field-text { font-size: 0.85rem; color: var(--text); line-height: 1.4; }
 </style>
 </head>
 <body>
@@ -1105,7 +1119,7 @@ ${hitSummary}
 
 Background field: Mercury Gate ${todayPos.mercury?.gate||'?'}, Venus Gate ${todayPos.venus?.gate||'?'}, Mars Gate ${todayPos.mars?.gate||'?'}, Jupiter Gate ${todayPos.jupiter?.gate||'?'}, Saturn Gate ${todayPos.saturn?.gate||'?'}
 
-Instructions: Write like a sharp, trusted friend who knows this person's chart inside out. Be direct and specific — never vague. Say exactly what to do, not what to 'consider'. Use confident language: 'This is the day to...' or 'Don't commit to anything until...' or 'Your energy peaks when...'. No filler words. No hedging. No jargon. Every sentence must feel like it was written for this exact person on this exact day.
+Instructions: Write like a Human Design coach who knows this person's chart. Ground every insight in their specific design — their Type, Authority, defined centers, and active gates. Be practical: tell them what to literally do, not abstract concepts. Reference chart mechanics plainly: 'Your Sacral will respond — wait for the gut yes or no', 'As a Generator, don\'t initiate this', 'Gate 44 in your channel means you\'re already wired for this'. No mystical language. No 'the universe', no 'cosmic'. Just what their design means in action this specific week.
 
 Return ONLY valid JSON, no markdown:
 {"focusSentence":"1 sentence. Must name their Human Design type AND one specific gate active this week. Must start with an action or a truth — not 'this week' or 'you'. Example style: 'Gate 48 is asking you to stop pretending you don't know the answer.' or 'Generators with Gate 34 lit up — this is the week your body leads, not your head.' Be bold. Be specific. Make it stop someone mid-scroll.","energyTheme":"3-5 words describing the energy pattern","bestAction":"1 sentence: the single best action this week","trapToAvoid":"1 sentence: the main trap to avoid","weekTheme":"5-7 word theme using actual gate names","sunNote":"2 sentences: Sun Gate ${todayPos.sun?.gate} ${todayPos.sun?.gname} and what it means for ${type}s","moonNote":"2 sentences about Moon's journey this week and the most powerful moon moment for this person","strategy":"2 sentences: concrete strategy for ${type} with ${auth} Authority this week","days":[${days.map(d=>`{"day":"${d.dayName}","date":"${d.dateStr}","sunGate":${d.pos.sun?.gate},"moonGate":${d.pos.moon?.gate},"sunHit":${!!d.sunHit},"moonHit":${!!d.moonHit},"energyWord":"5-8 words. Two punchy sentences. Like a best friend texting you. Real, warm, a little cheeky. GOOD: Sit with what you know. Not yet. / Make the move. Your body knows. / Rest. You earned it. / Say the thing. Just say it. BAD: Listen more than you speak, Hold the line on boundaries. Good ones feel like a whisper. Bad ones sound like LinkedIn.","focus":"1 sentence: the one thing to lean into today based on the gate energy. Plain English.","avoid":"1 sentence: the one thing to watch out for or skip today.","window":"1 sentence: the best time or moment today — e.g. morning clarity, evening decision, or if a gate/moon hit, call that out as a peak window."}`).join(',')}],"bestDays":"1-2 days with exact reason based on gate themes and type","bestFor":{"deepWork":"1-2 specific days best for focused solo work and why","conversations":"1-2 specific days best for important talks, pitches, or negotiations and why","launching":"1-2 specific days best for publishing, launching, or putting something out and why","rest":"1-2 specific days to protect energy and avoid draining commitments and why"},"backgroundField":"1 sentence on Mercury/Venus/Mars/Jupiter/Saturn backdrop","notSelf":"1 sentence: specific not-self watch for ${type} given dominant gates this week","affirmation":"12-16 words. Must reference a specific gate number or channel from their chart. Must feel like a punch, not a lullaby. No soft wellness language. Example style: 'Gate 48 knows. Stop waiting for more preparation. You are already enough.' Grounded, fierce, true."}`;
